@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hệ thống Quản lý Đồ án - CTUT Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <div class="app-wrapper">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="sidebar-brand">
+                <i class="fa-solid fa-graduation-cap"></i> CTUT
+            </div>
+            
+            <div class="sidebar-menu-title">DANH MỤC QUẢN LÝ</div>
+            <ul class="sidebar-menu" id="sidebarMenu"></ul>
+        </aside>
+
+        <!-- Main Wrapper -->
+        <div class="main-wrapper">
+            <header class="top-header">
+                <div class="search-box">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" placeholder="Tìm kiếm tài nguyên hệ thống...">
+                </div>
+
+                <div class="user-profile">
+                    <div class="avatar-circle" id="userAvatar">U</div>
+                    <div>
+                        <div class="fw-bold fs-6" id="userName">User Name</div>
+                        <span id="roleBadge" class="role-badge">ROLE</span>
+                    </div>
+                    <button id="btnLogout" class="btn btn-light btn-sm ms-3 text-danger border-0 rounded-circle p-2" title="Đăng xuất">
+                        <i class="fa-solid fa-right-from-bracket"></i>
+                    </button>
+                </div>
+            </header>
+
+            <section class="welcome-banner">
+                <h2 id="welcomeTitle">Chào mừng trở lại!</h2>
+                <p id="welcomeSub">Hệ thống chuyển đổi số hỗ trợ thực hiện, theo dõi tiến độ và đánh giá đồ án trực quan.</p>
+            </section>
+
+            <!-- Dynamic Content Area -->
+            <main class="edu-card" id="mainContent">
+                <div class="text-center py-5">
+                    <div class="spinner-border text-primary" role="status"></div>
+                    <p class="mt-2 text-muted">Đang tải dữ liệu...</p>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- MODAL 1: TẠO ĐỢT ĐỒ ÁN (ADMIN) -->
+    <div class="modal fade" id="modalTaoDot" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content rounded-4 border-0 shadow">
+                <div class="modal-header bg-primary text-white p-3 position-relative">
+                    <h5 class="modal-title w-100 text-center fw-bold text-uppercase m-0">TẠO ĐỢT ĐỒ ÁN MỚI</h5>
+                    <button type="button" class="btn-close btn-close-white position-absolute end-0 me-3" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <form id="formTaoDot">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold text-muted">Loại Đồ Án</label>
+                            <select id="loaiDoAnInput" class="form-select" onchange="autoGenerateTenDot()" required>
+                                <option value="DATN" data-label="Đồ án Tốt nghiệp">Đồ án Tốt nghiệp (DATN)</option>
+                                <option value="TTTN" data-label="Thực tập Tốt nghiệp">Thực tập Tốt nghiệp (TTTN)</option>
+                                <option value="DAHP" data-label="Đồ án Học phần">Đồ án Học phần (DAHP)</option>
+                            </select>
+                        </div>
+                        <div class="row g-2 mb-3">
+                            <div class="col-6">
+                                <label class="form-label fw-bold text-muted">Năm Học</label>
+                                <select id="namHocInput" class="form-select" onchange="autoGenerateTenDot()" required></select>
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label fw-bold text-muted">Học Kỳ</label>
+                                <select id="hocKyInput" class="form-select" onchange="autoGenerateTenDot()" required>
+                                    <option value="1">Học kỳ 1</option>
+                                    <option value="2">Học kỳ 2</option>
+                                    <option value="3">Học kỳ 3 (Hè)</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold text-muted">Tên Đợt Đồ Án (Tự động ghép)</label>
+                            <input type="text" id="tenDotInput" class="form-control bg-light fw-bold text-primary" readonly required>
+                        </div>
+                        <div class="row g-2 mb-4">
+                            <div class="col-6">
+                                <label class="form-label fw-bold text-muted">Ngày Bắt Đầu</label>
+                                <input type="date" id="ngayBatDauInput" class="form-control" required>
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label fw-bold text-muted">Ngày Kết Thúc (Hạn nộp)</label>
+                                <input type="date" id="ngayKetThucInput" class="form-control" required>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-end gap-2">
+                            <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Hủy bỏ</button>
+                            <button type="submit" class="btn btn-primary rounded-pill px-4 fw-bold">Xác nhận Tạo đợt</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 1B: SỬA ĐỢT ĐỒ ÁN (ADMIN) -->
+    <div class="modal fade" id="modalSuaDot" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content rounded-4 border-0 shadow">
+                <div class="modal-header bg-warning text-dark p-3 position-relative">
+                    <h5 class="modal-title w-100 text-center fw-bold text-uppercase m-0">CHỈNH SỬA ĐỢT ĐỒ ÁN</h5>
+                    <button type="button" class="btn-close position-absolute end-0 me-3" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <form id="formSuaDot">
+                        <input type="hidden" id="editDotId">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold text-muted">Tên Đợt Đồ Án</label>
+                            <input type="text" id="editTenDotInput" class="form-control fw-bold text-primary" required>
+                        </div>
+                        <div class="row g-2 mb-3">
+                            <div class="col-6">
+                                <label class="form-label fw-bold text-muted">Năm Học</label>
+                                <input type="text" id="editNamHocInput" class="form-control bg-light" readonly>
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label fw-bold text-muted">Học Kỳ</label>
+                                <select id="editHocKyInput" class="form-select" required>
+                                    <option value="1">Học kỳ 1</option>
+                                    <option value="2">Học kỳ 2</option>
+                                    <option value="3">Học kỳ 3 (Hè)</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row g-2 mb-4">
+                            <div class="col-6">
+                                <label class="form-label fw-bold text-muted">Ngày Bắt Đầu</label>
+                                <input type="date" id="editNgayBatDauInput" class="form-control" required>
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label fw-bold text-muted">Ngày Kết Thúc (Hạn nộp)</label>
+                                <input type="date" id="editNgayKetThucInput" class="form-control" required>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-end gap-2">
+                            <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Hủy bỏ</button>
+                            <button type="submit" class="btn btn-warning rounded-pill px-4 fw-bold">Cập nhật thay đổi</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 2: CẤP TÀI KHOẢN MỚI (ADMIN) -->
+    <div class="modal fade" id="modalCapTaiKhoan" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content rounded-4 border-0 shadow">
+                <div class="modal-header bg-primary text-white p-3 position-relative">
+                    <h5 class="modal-title w-100 text-center fw-bold text-uppercase m-0">CẤP TÀI KHOẢN MỚI</h5>
+                    <button type="button" class="btn-close btn-close-white position-absolute end-0 me-3" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <form id="formCapTaiKhoan">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold text-muted">Vai Trò</label>
+                            <select id="userRoleInput" class="form-select" onchange="autoFetchNextMaSo()" required>
+                                <option value="sinh_vien">Sinh viên</option>
+                                <option value="giang_vien">Giảng viên</option>
+                                <option value="admin">Quản trị viên (Admin)</option>
+                            </select>
+                        </div>
+                        <div class="row g-2 mb-3">
+                            <div class="col-6">
+                                <label class="form-label fw-bold text-muted">Mã Số (Tự động)</label>
+                                <input type="text" id="userMaSoInput" class="form-control fw-bold text-primary" required>
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label fw-bold text-muted">Họ và Tên</label>
+                                <input type="text" id="userHoTenInput" class="form-control" required placeholder="Nguyễn Văn A">
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold text-muted">Email</label>
+                            <input type="email" id="userEmailInput" class="form-control" required placeholder="user@ctuet.edu.vn">
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label fw-bold text-muted">Mật khẩu khởi tạo</label>
+                            <input type="text" id="userPasswordInput" class="form-control fw-bold text-success" required>
+                        </div>
+                        <div class="d-flex justify-content-end gap-2">
+                            <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Hủy bỏ</button>
+                            <button type="submit" class="btn btn-primary rounded-pill px-4 fw-bold">Xác nhận Cấp</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 2B: SỬA TÀI KHOẢN (ADMIN) -->
+    <div class="modal fade" id="modalSuaTaiKhoan" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content rounded-4 border-0 shadow">
+                <div class="modal-header bg-warning text-dark p-3 position-relative">
+                    <h5 class="modal-title w-100 text-center fw-bold text-uppercase m-0">CẬP NHẬT TÀI KHOẢN</h5>
+                    <button type="button" class="btn-close position-absolute end-0 me-3" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <form id="formSuaTaiKhoan">
+                        <input type="hidden" id="editUserId">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold text-muted">Vai Trò</label>
+                            <select id="editRoleInput" class="form-select" required>
+                                <option value="sinh_vien">Sinh viên</option>
+                                <option value="giang_vien">Giảng viên</option>
+                                <option value="admin">Quản trị viên (Admin)</option>
+                            </select>
+                        </div>
+                        <div class="row g-2 mb-3">
+                            <div class="col-6">
+                                <label class="form-label fw-bold text-muted">Mã Số</label>
+                                <input type="text" id="editMaSoInput" class="form-control bg-light fw-bold" readonly>
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label fw-bold text-muted">Họ và Tên</label>
+                                <input type="text" id="editHoTenInput" class="form-control" required>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold text-muted">Email</label>
+                            <input type="email" id="editEmailInput" class="form-control" required>
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label fw-bold text-muted">Đặt Mật Khẩu Mới (Để trống nếu giữ nguyên)</label>
+                            <input type="password" id="editPasswordInput" class="form-control" placeholder="Nhập mật khẩu mới...">
+                        </div>
+                        <div class="d-flex justify-content-end gap-2">
+                            <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Hủy bỏ</button>
+                            <button type="submit" class="btn btn-warning rounded-pill px-4 fw-bold">Cập nhật thay đổi</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 3: ĐĂNG TẢI ĐỀ TÀI (GIẢNG VIÊN) -->
+    <div class="modal fade" id="modalTaoDeTai" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content rounded-4 border-0 shadow">
+                <div class="modal-header bg-primary text-white p-3 position-relative">
+                    <h5 class="modal-title w-100 text-center fw-bold text-uppercase m-0">ĐĂNG TẢI ĐỀ TÀI MỚI</h5>
+                    <button type="button" class="btn-close btn-close-white position-absolute end-0 me-3" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <form id="formTaoDeTai">
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-8">
+                                <label class="form-label fw-bold text-muted">Đợt Đồ Án</label>
+                                <select id="deTaiDotSelect" class="form-select" required></select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold text-muted">Số SV Tối Đa</label>
+                                <select id="deTaiSoLuongInput" class="form-select" required>
+                                    <option value="1">1 Sinh viên</option>
+                                    <option value="2" selected>2 Sinh viên</option>
+                                    <option value="3">3 Sinh viên</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold text-muted">Tên Đề Tài</label>
+                            <input type="text" id="deTaiTenInput" class="form-control fw-bold text-primary" required placeholder="Nhập tên đề tài...">
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label fw-bold text-muted">Mô Tả & Yêu Cầu</label>
+                            <textarea id="deTaiMoTaInput" class="form-control" rows="4" required placeholder="Mô tả công nghệ, mục tiêu..."></textarea>
+                        </div>
+                        <div class="d-flex justify-content-end gap-2">
+                            <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Hủy bỏ</button>
+                            <button type="submit" class="btn btn-primary rounded-pill px-4 fw-bold">Xác nhận Đăng</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 3B: SỬA ĐỀ TÀI (GIẢNG VIÊN) -->
+    <div class="modal fade" id="modalSuaDeTai" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content rounded-4 border-0 shadow">
+                <div class="modal-header bg-warning text-dark p-3 position-relative">
+                    <h5 class="modal-title w-100 text-center fw-bold text-uppercase m-0">CHỈNH SỬA ĐỀ TÀI</h5>
+                    <button type="button" class="btn-close position-absolute end-0 me-3" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <form id="formSuaDeTai">
+                        <input type="hidden" id="editDeTaiId">
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-8">
+                                <label class="form-label fw-bold text-muted">Đợt Đồ Án</label>
+                                <select id="editDeTaiDotSelect" class="form-select bg-light" disabled></select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold text-muted">Số SV Tối Đa</label>
+                                <select id="editDeTaiSoLuongInput" class="form-select" required>
+                                    <option value="1">1 Sinh viên</option>
+                                    <option value="2">2 Sinh viên</option>
+                                    <option value="3">3 Sinh viên</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold text-muted">Tên Đề Tài</label>
+                            <input type="text" id="editDeTaiTenInput" class="form-control fw-bold text-primary" required>
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label fw-bold text-muted">Mô Tả & Yêu Cầu</label>
+                            <textarea id="editDeTaiMoTaInput" class="form-control" rows="4" required></textarea>
+                        </div>
+                        <div class="d-flex justify-content-end gap-2">
+                            <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Hủy bỏ</button>
+                            <button type="submit" class="btn btn-warning rounded-pill px-4 fw-bold">Cập nhật thay đổi</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 4: CHẤM ĐIỂM (GIẢNG VIÊN) -->
+    <div class="modal fade" id="modalChamDiem" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content rounded-4 border-0 shadow">
+                <div class="modal-header bg-success text-white p-3 position-relative">
+                    <h5 class="modal-title w-100 text-center fw-bold text-uppercase m-0">ĐÁNH GIÁ & CHẤM ĐIỂM ĐỒ ÁN</h5>
+                    <button type="button" class="btn-close btn-close-white position-absolute end-0 me-3" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <form id="formChamDiem">
+                        <input type="hidden" id="chamDiemDangKyId">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold text-muted">Điểm Hướng Dẫn (Thang điểm 0 - 10)</label>
+                            <input type="number" id="diemHuongDanInput" class="form-control fw-bold text-success fs-5" step="0.1" min="0" max="10" required placeholder="8.5">
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label fw-bold text-muted">Nhận Xét Của Giảng Viên</label>
+                            <textarea id="nhanXetInput" class="form-control" rows="4" placeholder="Nhận xét thái độ, chất lượng báo cáo..."></textarea>
+                        </div>
+                        <div class="d-flex justify-content-end gap-2">
+                            <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Hủy bỏ</button>
+                            <button type="submit" class="btn btn-success rounded-pill px-4 fw-bold">Lưu Kết Quả</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 5: XIN GIA HẠN (SINH VIÊN) -->
+    <div class="modal fade" id="modalXinGiaHan" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content rounded-4 border-0 shadow">
+                <div class="modal-header bg-warning text-dark p-3 position-relative">
+                    <h5 class="modal-title w-100 text-center fw-bold text-uppercase m-0">GỬI ĐƠN XIN GIA HẠN</h5>
+                    <button type="button" class="btn-close position-absolute end-0 me-3" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <form id="formXinGiaHan">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold text-muted">Hạn Nộp Mới Đề Xuất</label>
+                            <input type="date" id="giaHanDateInput" class="form-control" required>
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label fw-bold text-muted">Lý Do Xin Gia Hạn</label>
+                            <textarea id="giaHanLyDoInput" class="form-control" rows="4" required placeholder="Trình bày lý do cụ thể..."></textarea>
+                        </div>
+                        <div class="d-flex justify-content-end gap-2">
+                            <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Hủy bỏ</button>
+                            <button type="submit" class="btn btn-warning rounded-pill px-4 fw-bold">Gửi Yêu Cầu</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 6: CẬP NHẬT THÔNG TIN CÁ NHÂN -->
+    <div class="modal fade" id="modalProfileCapNhat" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content rounded-4 border-0 shadow">
+                <div class="modal-header bg-warning text-dark p-3 position-relative">
+                    <h5 class="modal-title w-100 text-center fw-bold text-uppercase m-0">CẬP NHẬT THÔNG TIN CÁ NHÂN</h5>
+                    <button type="button" class="btn-close position-absolute end-0 me-3" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <form id="formProfileCapNhat">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold text-muted">Vai Trò</label>
+                            <input type="text" id="profileRoleDisplay" class="form-control bg-light" disabled>
+                        </div>
+                        <div class="row g-2 mb-3">
+                            <div class="col-6">
+                                <label class="form-label fw-bold text-muted">Mã Số</label>
+                                <input type="text" id="profileMaSoDisplay" class="form-control bg-light fw-bold text-primary" disabled>
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label fw-bold text-muted">Họ và Tên</label>
+                                <input type="text" id="profileHoTenDisplay" class="form-control bg-light" disabled>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold text-muted">Email</label>
+                            <input type="email" id="profileEmailDisplay" class="form-control bg-light" disabled>
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label fw-bold text-muted">Đặt Mật Khẩu Mới (Để trống nếu giữ nguyên)</label>
+                            <input type="password" id="profileNewPasswordInput" class="form-control" placeholder="Nhập mật khẩu mới...">
+                        </div>
+                        <div class="d-flex justify-content-end gap-2">
+                            <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Hủy bỏ</button>
+                            <button type="submit" class="btn btn-warning rounded-pill px-4 fw-bold">Cập nhật thay đổi</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/dashboard.js"></script>
+</body>
+</html>

@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hệ thống Quản lý Đồ án - Trường Đại học Kỹ thuật - Công nghệ Cần Thơ</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="bg-light">
+
+    <!-- Top Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary px-4 py-3 shadow-sm">
+        <div class="container-fluid">
+            <a class="navbar-brand fw-bold fs-5" href="#">
+                <i class="fa-solid fa-graduation-cap me-2"></i>HỆ THỐNG QUẢN LÝ ĐỒ ÁN ĐẠI HỌC
+            </a>
+            <button class="btn btn-light rounded-pill px-4 fw-bold text-primary shadow-sm" data-bs-toggle="modal" data-bs-target="#modalLogin">
+                <i class="fa-solid fa-right-to-bracket me-1"></i> Đăng nhập
+            </button>
+        </div>
+    </nav>
+
+    <!-- Hero Banner -->
+    <div class="container my-5">
+        <div class="p-5 bg-white rounded-5 shadow-sm border text-center">
+            <span class="badge bg-primary-subtle text-primary px-3 py-2 rounded-pill mb-3 fw-bold">HỆ THỐNG CHUYỂN ĐỔI SỐ HỌC THUẬT</span>
+            <h1 class="fw-bold text-primary display-5 mb-3">Trường Đại Học Kỹ Thuật - Công Nghệ Cần Thơ</h1>
+            <p class="text-muted fs-5 mb-4 mx-auto" style="max-width: 750px;">
+                Nền tảng số hóa toàn bộ quy trình đăng ký đề tài, phân công hướng dẫn, nộp báo cáo đồ án tốt nghiệp và theo dõi kết quả đánh giá học thuật minh bạch, chính xác.
+            </p>
+            <button class="btn btn-primary rounded-pill px-5 py-3 fw-bold fs-6 shadow" data-bs-toggle="modal" data-bs-target="#modalLogin">
+                <i class="fa-solid fa-arrow-right-to-bracket me-2"></i>Đăng Nhập Hệ Thống
+            </button>
+        </div>
+    </div>
+
+    <!-- Modal Đăng Nhập -->
+    <div class="modal fade" id="modalLogin" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content rounded-4 border-0 shadow">
+                <div class="modal-header bg-primary text-white p-4">
+                    <h5 class="fw-bold modal-title m-0"><i class="fa-solid fa-user-lock me-2"></i>Đăng Nhập Hệ Thống</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <form id="formLogin">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold text-muted">Địa chỉ Email</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light"><i class="fa-solid fa-envelope text-muted"></i></span>
+                                <input type="email" id="loginEmail" class="form-control" placeholder="user@ctuet.edu.vn" required>
+                            </div>
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label fw-bold text-muted">Mật khẩu</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light"><i class="fa-solid fa-key text-muted"></i></span>
+                                <input type="password" id="loginPassword" class="form-control" placeholder="••••••••" required>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100 rounded-pill py-2 fw-bold shadow">
+                            Xác Nhận Đăng Nhập
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/api.js"></script>
+    <script>
+        document.getElementById('formLogin').onsubmit = async function(e) {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            const mat_khau = document.getElementById('loginPassword').value;
+
+            try {
+                const res = await fetchAPI('/auth/login', 'POST', { email, mat_khau });
+                localStorage.setItem('token', res.token);
+                localStorage.setItem('user', JSON.stringify(res.user));
+                window.location.href = 'dashboard.html';
+            } catch (error) {
+                alert('Đăng nhập thất bại: ' + error.message);
+            }
+        };
+    </script>
+</body>
+</html>
