@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hệ thống Quản lý Đồ án - Trường Đại học Kỹ thuật - Công nghệ Cần Thơ</title>
+    <!-- Bootstrap 5 & FontAwesome 6 -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="css/style.css">
@@ -11,57 +12,182 @@
 <body class="bg-light">
 
     <!-- Top Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary px-4 py-3 shadow-sm">
-        <div class="container-fluid">
-            <a class="navbar-brand fw-bold fs-5" href="#">
-                <i class="fa-solid fa-graduation-cap me-2"></i>HỆ THỐNG QUẢN LÝ ĐỒ ÁN ĐẠI HỌC
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary px-4 py-3 shadow-sm sticky-top">
+        <div class="container">
+            <a class="navbar-brand fw-bold d-flex align-items-center gap-2" href="#">
+                <i class="fa-solid fa-graduation-cap fs-3"></i>
+                <div>
+                    <div class="fs-6 fw-bold text-uppercase">HỆ THỐNG QUẢN LÝ ĐỒ ÁN ĐẠI HỌC</div>
+                    <small style="font-size: 0.75rem; opacity: 0.85;">TRƯỜNG ĐẠI HỌC KỸ THUẬT - CÔNG NGHỆ CẦN THƠ</small>
+                </div>
             </a>
-            <button class="btn btn-light rounded-pill px-4 fw-bold text-primary shadow-sm" data-bs-toggle="modal" data-bs-target="#modalLogin">
-                <i class="fa-solid fa-right-to-bracket me-1"></i> Đăng nhập
-            </button>
+            <div class="d-flex align-items-center gap-2">
+                <a href="https://ctuet.edu.vn" target="_blank" class="btn btn-outline-light rounded-pill px-3 fw-bold btn-sm d-none d-md-inline-block">
+                    <i class="fa-solid fa-globe me-1"></i> Trang chủ CTUT
+                </a>
+                <button class="btn btn-light rounded-pill px-4 fw-bold text-primary shadow-sm" data-bs-toggle="modal" data-bs-target="#modalLogin">
+                    <i class="fa-solid fa-right-to-bracket me-1"></i> Đăng nhập
+                </button>
+            </div>
         </div>
     </nav>
 
     <!-- Hero Banner -->
-    <div class="container my-5">
-        <div class="p-5 bg-white rounded-5 shadow-sm border text-center">
-            <span class="badge bg-primary-subtle text-primary px-3 py-2 rounded-pill mb-3 fw-bold">HỆ THỐNG CHUYỂN ĐỔI SỐ HỌC THUẬT</span>
-            <h1 class="fw-bold text-primary display-5 mb-3">Trường Đại Học Kỹ Thuật - Công Nghệ Cần Thơ</h1>
-            <p class="text-muted fs-5 mb-4 mx-auto" style="max-width: 750px;">
-                Nền tảng số hóa toàn bộ quy trình đăng ký đề tài, phân công hướng dẫn, nộp báo cáo đồ án tốt nghiệp và theo dõi kết quả đánh giá học thuật minh bạch, chính xác.
-            </p>
-            <button class="btn btn-primary rounded-pill px-5 py-3 fw-bold fs-6 shadow" data-bs-toggle="modal" data-bs-target="#modalLogin">
-                <i class="fa-solid fa-arrow-right-to-bracket me-2"></i>Đăng Nhập Hệ Thống
-            </button>
+    <header class="py-5 bg-white border-bottom">
+        <div class="container py-4">
+            <div class="row align-items-center g-5">
+                <div class="col-lg-7">
+                    <span class="badge bg-primary-subtle text-primary px-3 py-2 rounded-pill fw-bold mb-3">
+                        <i class="fa-solid fa-bolt me-1"></i> NỀN TẢNG CHUYỂN ĐỔI SỐ HỌC THUẬT 2026
+                    </span>
+                    <h1 class="display-5 fw-bold text-dark mb-3">
+                        Quản Lý & Theo Dõi <span class="text-primary">Đồ Án Tốt Nghiệp</span> Trực Tuyến
+                    </h1>
+                    <p class="fs-5 text-muted mb-4">
+                        Giải pháp tối ưu hóa toàn bộ quy trình: phân công hướng dẫn, đăng ký đề tài, nộp báo cáo kiểm soát timestamp và đánh giá kết quả minh bạch dành cho Giảng viên & Sinh viên.
+                    </p>
+                    <div class="d-flex gap-3">
+                        <button class="btn btn-primary rounded-pill px-5 py-3 fw-bold fs-6 shadow-sm" data-bs-toggle="modal" data-bs-target="#modalLogin">
+                            <i class="fa-solid fa-arrow-right-to-bracket me-2"></i>Đăng Nhập Hệ Thống
+                        </button>
+                        <a href="#tin-tuc" class="btn btn-outline-secondary rounded-pill px-4 py-3 fw-bold fs-6">
+                            Xem Hoạt Động <i class="fa-solid fa-arrow-down ms-1"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="col-lg-5 text-center">
+                    <div class="p-4 bg-light rounded-5 border shadow-sm">
+                        <i class="fa-solid fa-book-bookmark text-primary display-1 mb-3"></i>
+                        <h4 class="fw-bold text-dark">CTUT THESIS PORTAL</h4>
+                        <p class="text-muted small mb-0">Nhanh chóng - Tiện lợi - Chuẩn hóa</p>
+                    </div>
+                </div>
+            </div>
         </div>
-    </div>
+    </header>
 
-    <!-- Modal Đăng Nhập -->
+    <!-- Số liệu Thống kê Giả lập -->
+    <section class="container py-5">
+        <div class="row g-4 text-center">
+            <div class="col-md-4">
+                <div class="card p-4 border-0 shadow-sm rounded-4 h-100 bg-white">
+                    <div class="text-primary fs-1 mb-2"><i class="fa-solid fa-folder-tree"></i></div>
+                    <h3 class="fw-bold text-dark">150+</h3>
+                    <p class="text-muted m-0">Đề tài Đồ án đang mở</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card p-4 border-0 shadow-sm rounded-4 h-100 bg-white">
+                    <div class="text-success fs-1 mb-2"><i class="fa-solid fa-user-graduate"></i></div>
+                    <h3 class="fw-bold text-dark">450+</h3>
+                    <p class="text-muted m-0">Sinh viên tham gia thực hiện</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card p-4 border-0 shadow-sm rounded-4 h-100 bg-white">
+                    <div class="text-warning fs-1 mb-2"><i class="fa-solid fa-chalkboard-user"></i></div>
+                    <h3 class="fw-bold text-dark">40+</h3>
+                    <p class="text-muted m-0">Cán bộ Giảng viên Hướng dẫn</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Tin tức & Hoạt động đào tạo -->
+    <section id="tin-tuc" class="container py-4 mb-5">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h4 class="fw-bold text-primary m-0"><i class="fa-solid fa-newspaper me-2"></i>Tin Tức & Hoạt Động Đào Tạo</h4>
+            <span class="text-muted small">Cập nhật mới nhất năm 2026</span>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden bg-white">
+                    <div class="p-4">
+                        <span class="badge bg-primary-subtle text-primary mb-2">Kế hoạch</span>
+                        <h6 class="fw-bold text-dark">Kế hoạch thực hiện Đồ án tốt nghiệp Học kỳ 1 (2026 - 2027)</h6>
+                        <p class="text-muted small">Khoa CNTT thông báo thời gian đăng ký đề tài và danh sách cán bộ hướng dẫn đồ án tốt nghiệp cho sinh viên khóa 2022.</p>
+                        <hr>
+                        <small class="text-muted"><i class="fa-regular fa-clock me-1"></i> 10/08/2026</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden bg-white">
+                    <div class="p-4">
+                        <span class="badge bg-success-subtle text-success mb-2">Hội nghị</span>
+                        <h6 class="fw-bold text-dark">Hội nghị Sinh viên Nghiên cứu Khoa học & Sáng tạo 2026</h6>
+                        <p class="text-muted small">Khuyến khích sinh viên đăng ký các đề tài ứng dụng trí tuệ nhân tạo, chuyển đổi số và phát triển phần mềm doanh nghiệp.</p>
+                        <hr>
+                        <small class="text-muted"><i class="fa-regular fa-clock me-1"></i> 05/08/2026</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden bg-white">
+                    <div class="p-4">
+                        <span class="badge bg-warning-subtle text-warning mb-2">Doanh nghiệp</span>
+                        <h6 class="fw-bold text-dark">Chương trình Thực tập & Đồ án Doanh nghiệp IVS JSC</h6>
+                        <p class="text-muted small">Phối hợp cùng Công ty Cổ phần IVS triển khai hướng dẫn đề tài thực tế chuẩn thị trường Nhật Bản cho sinh viên năm cuối.</p>
+                        <hr>
+                        <small class="text-muted"><i class="fa-regular fa-clock me-1"></i> 01/08/2026</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white py-4 mt-auto">
+        <div class="container text-center small opacity-75">
+            <p class="mb-1 fw-bold">TRƯỜNG ĐẠI HỌC KỸ THUẬT - CÔNG NGHỆ CẦN THƠ (CTUT)</p>
+            <p class="mb-1">Địa chỉ: 256 Nguyễn Văn Cừ, Quận Ninh Kiều, TP. Cần Thơ</p>
+            <p class="mb-0">© 2026 Hệ thống Quản lý Đồ án Tốt nghiệp Đại học.</p>
+        </div>
+    </footer>
+
+    <!-- MODAL ĐĂNG NHẬP (CÓ QUÊN MK & CAPTCHA CHECKBOX) -->
     <div class="modal fade" id="modalLogin" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content rounded-4 border-0 shadow">
-                <div class="modal-header bg-primary text-white p-4">
-                    <h5 class="fw-bold modal-title m-0"><i class="fa-solid fa-user-lock me-2"></i>Đăng Nhập Hệ Thống</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                <div class="modal-header bg-primary text-white p-3 position-relative">
+                    <h5 class="modal-title w-100 text-center fw-bold text-uppercase m-0">ĐĂNG NHẬP HỆ THỐNG</h5>
+                    <button type="button" class="btn-close btn-close-white position-absolute end-0 me-3" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body p-4">
                     <form id="formLogin">
                         <div class="mb-3">
-                            <label class="form-label fw-bold text-muted">Địa chỉ Email</label>
+                            <label class="form-label fw-bold text-muted small">Địa chỉ Email trường</label>
                             <div class="input-group">
-                                <span class="input-group-text bg-light"><i class="fa-solid fa-envelope text-muted"></i></span>
-                                <input type="email" id="loginEmail" class="form-control" placeholder="user@ctuet.edu.vn" required>
+                                <span class="input-group-text bg-light border-end-0"><i class="fa-solid fa-envelope text-muted"></i></span>
+                                <input type="email" id="loginEmail" class="form-control border-start-0 ps-0" placeholder="user@ctuet.edu.vn" required>
                             </div>
                         </div>
-                        <div class="mb-4">
-                            <label class="form-label fw-bold text-muted">Mật khẩu</label>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold text-muted small">Mật khẩu</label>
                             <div class="input-group">
-                                <span class="input-group-text bg-light"><i class="fa-solid fa-key text-muted"></i></span>
-                                <input type="password" id="loginPassword" class="form-control" placeholder="••••••••" required>
+                                <span class="input-group-text bg-light border-end-0"><i class="fa-solid fa-key text-muted"></i></span>
+                                <input type="password" id="loginPassword" class="form-control border-start-0 border-end-0 ps-0" placeholder="••••••••" required>
+                                <!-- Nút bấm Ẩn/Hiện Mật khẩu -->
+                                <button class="btn btn-light border border-start-0 text-muted" type="button" id="btnTogglePassword" onclick="togglePasswordVisibility()">
+                                    <i class="fa-solid fa-eye" id="togglePasswordIcon"></i>
+                                </button>
                             </div>
                         </div>
+
+                        <!-- Ghi nhớ & Quên MK -->
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="rememberMe" checked>
+                                <label class="form-check-label small text-muted" for="rememberMe">Ghi nhớ đăng nhập</label>
+                            </div>
+                            <a href="javascript:void(0)" onclick="alert('Vui lòng liên hệ Phòng Đào tạo / Quản trị viên hệ thống để được cấp lại mật khẩu mới!')" class="small text-primary text-decoration-none fw-bold">Quên mật khẩu?</a>
+                        </div>
+
+                        
+
                         <button type="submit" class="btn btn-primary w-100 rounded-pill py-2 fw-bold shadow">
-                            Xác Nhận Đăng Nhập
+                            <i class="fa-solid fa-right-to-bracket me-1"></i> Xác Nhận Đăng Nhập
                         </button>
                     </form>
                 </div>
@@ -69,9 +195,11 @@
         </div>
     </div>
 
+    <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="js/api.js"></script>
     <script>
+
         document.getElementById('formLogin').onsubmit = async function(e) {
             e.preventDefault();
             const email = document.getElementById('loginEmail').value;
@@ -86,6 +214,21 @@
                 alert('Đăng nhập thất bại: ' + error.message);
             }
         };
+        
+        function togglePasswordVisibility() {
+            const passwordInput = document.getElementById('loginPassword');
+            const toggleIcon = document.getElementById('togglePasswordIcon');
+
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleIcon.classList.remove('fa-eye');
+                toggleIcon.classList.add('fa-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                toggleIcon.classList.remove('fa-eye-slash');
+                toggleIcon.classList.add('fa-eye');
+            }
+        }
     </script>
 </body>
 </html>

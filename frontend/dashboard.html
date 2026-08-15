@@ -339,28 +339,61 @@
         </div>
     </div>
 
-    <!-- MODAL 4: CHẤM ĐIỂM (GIẢNG VIÊN) -->
+    <!-- MODAL 4: CHI TIẾT ĐỒ ÁN & CHẤM ĐIỂM (GIẢNG VIÊN) -->
     <div class="modal fade" id="modalChamDiem" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content rounded-4 border-0 shadow">
                 <div class="modal-header bg-success text-white p-3 position-relative">
-                    <h5 class="modal-title w-100 text-center fw-bold text-uppercase m-0">ĐÁNH GIÁ & CHẤM ĐIỂM ĐỒ ÁN</h5>
+                    <h5 class="modal-title w-100 text-center fw-bold text-uppercase m-0">
+                        <i class="fa-solid fa-graduation-cap me-2"></i>ĐÁNH GIÁ & CHẤM ĐIỂM ĐỒ ÁN
+                    </h5>
                     <button type="button" class="btn-close btn-close-white position-absolute end-0 me-3" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body p-4">
+                    <!-- Khung thông tin chi tiết đồ án của sinh viên -->
+                    <div class="card bg-light border-0 rounded-4 p-3 mb-4">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <div>
+                                <span class="badge bg-primary rounded-pill px-3 py-1 mb-1" id="modalChamDiemDot">Đợt Đồ Án</span>
+                                <h5 class="fw-bold text-primary m-0 mt-1" id="modalChamDiemTenDeTai">Tên đề tài</h5>
+                            </div>
+                            <span class="badge bg-warning text-dark px-3 py-2 rounded-pill" id="modalChamDiemTrangThai">Đang thực hiện</span>
+                        </div>
+                        <p class="text-muted small mb-3" id="modalChamDiemMoTa">Mô tả đề tài...</p>
+                        
+                        <div class="row g-2 border-top pt-2 small text-muted">
+                            <div class="col-md-6"><strong>Sinh viên thực hiện:</strong> <span class="text-dark fw-bold" id="modalChamDiemSV">Nguyễn Văn A (SV000001)</span></div>
+                            <div class="col-md-6"><strong>Hạn chót nộp báo cáo:</strong> <span class="text-danger fw-bold" id="modalChamDiemDeadline">--/--/----</span></div>
+                        </div>
+                    </div>
+
+                    <!-- Danh sách tệp báo cáo đã nộp -->
+                    <div class="card border border-light-subtle rounded-4 p-3 mb-4">
+                        <h6 class="fw-bold text-dark mb-2"><i class="fa-solid fa-file-arrow-up me-2 text-primary"></i>Tệp Báo Cáo Sinh Viên Đã Nộp</h6>
+                        <div id="modalChamDiemListBaoCao">
+                            <p class="text-muted small m-0">Đang tải danh sách báo cáo...</p>
+                        </div>
+                    </div>
+
+                    <!-- Form nhập điểm & nhận xét -->
                     <form id="formChamDiem">
                         <input type="hidden" id="chamDiemDangKyId">
-                        <div class="mb-3">
-                            <label class="form-label fw-bold text-muted">Điểm Hướng Dẫn (Thang điểm 0 - 10)</label>
-                            <input type="number" id="diemHuongDanInput" class="form-control fw-bold text-success fs-5" step="0.1" min="0" max="10" required placeholder="8.5">
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-12">
+                                <label class="form-label fw-bold text-muted small">Điểm Hướng Dẫn (Thang điểm 0 - 10)</label>
+                                <input type="number" id="diemHuongDanInput" class="form-control fw-bold text-success fs-4" step="0.1" min="0" max="10" required placeholder="Nhập điểm (VD: 8.5)...">
+                            </div>
+                            <div class="col-md-12">
+                                <label class="form-label fw-bold text-muted small">Nhận Xét Của Giảng Viên</label>
+                                <textarea id="nhanXetInput" class="form-control" rows="3" required placeholder="Nhận xét chất lượng báo cáo, thái độ thực hiện..."></textarea>
+                            </div>
                         </div>
-                        <div class="mb-4">
-                            <label class="form-label fw-bold text-muted">Nhận Xét Của Giảng Viên</label>
-                            <textarea id="nhanXetInput" class="form-control" rows="4" placeholder="Nhận xét thái độ, chất lượng báo cáo..."></textarea>
-                        </div>
-                        <div class="d-flex justify-content-end gap-2">
+
+                        <div class="d-flex justify-content-end gap-2 pt-2 border-top">
                             <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Hủy bỏ</button>
-                            <button type="submit" class="btn btn-success rounded-pill px-4 fw-bold">Lưu Kết Quả</button>
+                            <button type="submit" class="btn btn-success rounded-pill px-4 fw-bold shadow-sm">
+                                <i class="fa-solid fa-check me-1"></i> Xác Nhận Lưu Điểm (Khóa kết quả)
+                            </button>
                         </div>
                     </form>
                 </div>

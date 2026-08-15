@@ -7,6 +7,7 @@ document.addEventListener('DOMContentLoaded', function() {
     renderHeaderInfo(currentUser);
     renderSidebarByRole(currentUser.vai_tro);
 
+    // Tự động tải trang mặc định dựa theo vai trò
     if (currentUser.vai_tro === 'admin') loadAdminDotDoAn();
     else if (currentUser.vai_tro === 'giang_vien') loadGVDeTai();
     else if (currentUser.vai_tro === 'sinh_vien') loadSVDanhSachDeTai();
@@ -16,7 +17,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 function renderHeaderInfo(user) {
     document.getElementById('userName').textContent = user.ho_ten;
-    document.getElementById('welcomeTitle').textContent = `Chào mừng, ${user.ho_ten}!`;
+    document.getElementById('welcomeTitle').textContent = `Chào mừng, ${user.ho_ten}! 👋`;
     document.getElementById('userAvatar').textContent = user.ho_ten.charAt(0).toUpperCase();
 
     const roleBadge = document.getElementById('roleBadge');
@@ -24,7 +25,6 @@ function renderHeaderInfo(user) {
     roleBadge.className = `role-badge role-${user.vai_tro}`;
 }
 
-// Xử lý Active Sidebar Menu chính xác khi click
 function setActiveMenu(element) {
     const links = document.querySelectorAll('#sidebarMenu a');
     links.forEach(l => l.classList.remove('active'));
@@ -44,8 +44,7 @@ function renderSidebarByRole(role) {
     } else if (role === 'giang_vien') {
         menuHTML = `
             <li><a href="javascript:void(0)" class="active" onclick="setActiveMenu(this); loadGVDeTai()"><i class="fa-solid fa-book-bookmark"></i> Quản lý Đề tài</a></li>
-            <li><a href="javascript:void(0)" onclick="setActiveMenu(this); loadGVSinhVien()"><i class="fa-solid fa-user-check"></i> Duyệt SV & Danh sách</a></li>
-            <li><a href="javascript:void(0)" onclick="setActiveMenu(this); loadGVChamDiem()"><i class="fa-solid fa-pen-nib"></i> Chấm điểm Đồ án</a></li>
+            <li><a href="javascript:void(0)" onclick="setActiveMenu(this); loadGVDanhSachSinhVien()"><i class="fa-solid fa-users-viewfinder"></i> Danh sách sinh viên</a></li>
             <li><a href="javascript:void(0)" onclick="setActiveMenu(this); loadGVDuyetGiaHan()"><i class="fa-solid fa-clock-rotate-left"></i> Duyệt Xin gia hạn</a></li>
             <li><a href="javascript:void(0)" onclick="setActiveMenu(this); loadProfile()"><i class="fa-solid fa-user"></i> Thông tin cá nhân</a></li>
         `;
@@ -60,7 +59,7 @@ function renderSidebarByRole(role) {
 }
 
 // ========================================================
-// 1. PHÂN HỆ ADMIN: QUẢN LÝ ĐỢT & TÀI KHOẢN
+// 1. PHÂN HỆ ADMIN
 // ========================================================
 let cacheListDot = [];
 
@@ -310,52 +309,28 @@ function filterUsersCombined() {
     renderUsersRows(filtered);
 }
 
-/* global bootstrap */
-
-// 1. Hàm tự động lấy Mã số tiếp theo từ Backend
 async function autoFetchNextMaSo() {
-    const roleSelect = document.getElementById('userRoleInput');
-    const role = roleSelect ? roleSelect.value : 'sinh_vien';
-    const inputMaSo = document.getElementById('userMaSoInput');
-
+    const role = document.getElementById('userRoleInput').value;
     try {
         const data = await fetchAPI(`/auth/next-ma-so/${role}`);
-        if (data && data.nextMaSo && inputMaSo) {
-            inputMaSo.value = data.nextMaSo;
-        }
-    } catch (error) {
-        console.error('Lỗi lấy mã số:', error);
-    }
+        if (data && data.nextMaSo) document.getElementById('userMaSoInput').value = data.nextMaSo;
+    } catch (e) { console.error(e); }
 }
 
-// 2. Mở Modal Cấp tài khoản mới
 async function showModalCapTaiKhoan() {
-    // 1. Tự động lấy mã số mới nhất
     await autoFetchNextMaSo();
-
-    // 2. Tạo mật khẩu ngẫu nhiên 8 ký tự
     const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
     let pass = '';
-    for (let i = 0; i < 8; i++) {
-        pass += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
-    const passInput = document.getElementById('userPasswordInput');
-    if (passInput) passInput.value = pass;
+    for (let i = 0; i < 8; i++) pass += chars.charAt(Math.floor(Math.random() * chars.length));
+    document.getElementById('userPasswordInput').value = pass;
+    document.getElementById('userHoTenInput').value = '';
+    document.getElementById('userEmailInput').value = '';
 
-    // 3. Reset các ô họ tên, email
-    const hoTenInput = document.getElementById('userHoTenInput');
-    const emailInput = document.getElementById('userEmailInput');
-    if (hoTenInput) hoTenInput.value = '';
-    if (emailInput) emailInput.value = '';
-
-    const modalElement = document.getElementById('modalCapTaiKhoan');
-    const modal = new bootstrap.Modal(modalElement);
+    const modal = new bootstrap.Modal(document.getElementById('modalCapTaiKhoan'));
     modal.show();
 
-    // 4. Xử lý sự kiện Submit Form Cấp tài khoản
     document.getElementById('formCapTaiKhoan').onsubmit = async function(e) {
         e.preventDefault();
-
         const bodyData = {
             ma_so: document.getElementById('userMaSoInput').value.trim(),
             ho_ten: document.getElementById('userHoTenInput').value.trim(),
@@ -363,19 +338,15 @@ async function showModalCapTaiKhoan() {
             vai_tro: document.getElementById('userRoleInput').value,
             mat_khau: document.getElementById('userPasswordInput').value.trim()
         };
-
         try {
             const res = await fetchAPI('/auth/register', 'POST', bodyData);
-            alert(`🎉 ${res.message}\n🔑 Mật khẩu khởi tạo: ${bodyData.mat_khau}`);
+            alert(`🎉 ${res.message}\n🔑 Mật khẩu: ${bodyData.mat_khau}`);
             modal.hide();
             loadAdminTaiKhoan();
-        } catch (error) {
-            alert('Lỗi: ' + error.message);
-        }
+        } catch (error) { alert('Lỗi: ' + error.message); }
     };
 }
 
-// 3. Mở Modal Chỉnh sửa tài khoản
 function showModalSuaTaiKhoan(id, maSo, hoTen, email, vaiTro) {
     document.getElementById('editUserId').value = id;
     document.getElementById('editMaSoInput').value = maSo;
@@ -384,8 +355,7 @@ function showModalSuaTaiKhoan(id, maSo, hoTen, email, vaiTro) {
     document.getElementById('editRoleInput').value = vaiTro;
     document.getElementById('editPasswordInput').value = '';
 
-    const modalElement = document.getElementById('modalSuaTaiKhoan');
-    const modal = new bootstrap.Modal(modalElement);
+    const modal = new bootstrap.Modal(document.getElementById('modalSuaTaiKhoan'));
     modal.show();
 
     document.getElementById('formSuaTaiKhoan').onsubmit = async function(e) {
@@ -397,32 +367,26 @@ function showModalSuaTaiKhoan(id, maSo, hoTen, email, vaiTro) {
             vai_tro: document.getElementById('editRoleInput').value,
             mat_khau_moi: document.getElementById('editPasswordInput').value.trim()
         };
-
         try {
             const res = await fetchAPI(`/auth/users/${editId}`, 'PUT', bodyData);
             alert(res.message);
             modal.hide();
             loadAdminTaiKhoan();
-        } catch (error) {
-            alert('Lỗi: ' + error.message);
-        }
+        } catch (error) { alert(error.message); }
     };
 }
 
-// 4. Xóa tài khoản
 async function deleteUserAction(id, hoTen) {
     if (!confirm(`Bạn có chắc muốn xóa tài khoản "${hoTen}"?`)) return;
     try {
         const res = await fetchAPI(`/auth/users/${id}`, 'DELETE');
         alert(res.message);
         loadAdminTaiKhoan();
-    } catch (error) {
-        alert('Lỗi: ' + error.message);
-    }
+    } catch (error) { alert(error.message); }
 }
 
 // ========================================================
-// 2. PHÂN HỆ GIẢNG VIÊN: ĐỀ TÀI, DUYỆT SV, CHẤM ĐIỂM
+// 2. PHÂN HỆ GIẢNG VIÊN
 // ========================================================
 let cacheListGVDeTai = [];
 
@@ -435,6 +399,17 @@ async function loadGVDeTai() {
                 <i class="fa-solid fa-plus me-1"></i> Đăng tải đề tài mới
             </button>
         </div>
+
+        <!-- Thanh Tìm kiếm Realtime theo Tên Đề Tài -->
+        <div class="row g-3 mb-4 bg-light p-3 rounded-4 border">
+            <div class="col-md-12">
+                <div class="input-group">
+                    <span class="input-group-text bg-white"><i class="fa-solid fa-magnifying-glass text-muted"></i></span>
+                    <input type="text" id="searchGVDeTaiInput" class="form-control" placeholder="Nhập tên đề tài hoặc mô tả để tìm kiếm nhanh..." oninput="filterGVDeTaiRealtime()">
+                </div>
+            </div>
+        </div>
+
         <div class="table-responsive">
             <table class="table table-hover align-middle border rounded-3 overflow-hidden">
                 <thead class="table-light">
@@ -459,7 +434,7 @@ function renderGVDeTaiRows(listDeTai) {
     const tableBody = document.getElementById('deTaiTableBody');
     if (!tableBody) return;
     if (!listDeTai || listDeTai.length === 0) {
-        tableBody.innerHTML = `<tr><td colspan="6" class="text-center text-muted py-4">Bạn chưa đăng tải đề tài nào.</td></tr>`;
+        tableBody.innerHTML = `<tr><td colspan="6" class="text-center text-muted py-4">Không tìm thấy đề tài nào.</td></tr>`;
         return;
     }
     tableBody.innerHTML = listDeTai.map((dt, index) => {
@@ -486,6 +461,14 @@ function renderGVDeTaiRows(listDeTai) {
             </tr>
         `;
     }).join('');
+}
+
+function filterGVDeTaiRealtime() {
+    const keyword = (document.getElementById('searchGVDeTaiInput')?.value || '').toLowerCase().trim();
+    const filtered = cacheListGVDeTai.filter(dt => 
+        dt.ten_de_tai.toLowerCase().includes(keyword) || (dt.mo_ta && dt.mo_ta.toLowerCase().includes(keyword))
+    );
+    renderGVDeTaiRows(filtered);
 }
 
 function escapeHtml(str) {
@@ -564,57 +547,224 @@ async function deleteDeTaiAction(id, ten) {
     } catch (error) { alert(error.message); }
 }
 
-// Duyệt sinh viên
-async function loadGVSinhVien() {
+// ----------------------------------------------------
+// GIẢNG VIÊN: DANH SÁCH SINH VIÊN (GỒM 2 TAB: DUYỆT & HD)
+// ----------------------------------------------------
+let cacheGVDangKyList = [];
+let cacheGVChamDiemList = [];
+
+async function loadGVDanhSachSinhVien(activeTab = 'tabDuyet') {
     const mainContent = document.getElementById('mainContent');
     mainContent.innerHTML = `
-        <h4 class="fw-bold text-primary mb-4"><i class="fa-solid fa-user-check me-2"></i>Duyệt Sinh Viên Đăng Ký Đề Tài</h4>
-        <div class="table-responsive">
-            <table class="table table-hover align-middle border rounded-3 overflow-hidden">
-                <thead class="table-light">
-                    <tr><th>#</th><th>MSSV</th><th>Họ và Tên SV</th><th>Tên Đề Tài</th><th>Trạng Thái</th><th>Thao Tác</th></tr>
-                </thead>
-                <tbody id="svDangKyTableBody">
-                    <tr><td colspan="6" class="text-center py-4"><div class="spinner-border text-primary"></div></td></tr>
-                </tbody>
-            </table>
+        <h4 class="fw-bold text-primary mb-4"><i class="fa-solid fa-users-viewfinder me-2"></i>Danh Sách Sinh Viên</h4>
+
+        <!-- 2 Tabs Điều hướng -->
+        <ul class="nav nav-pills mb-4 gap-2 bg-light p-2 rounded-4 border">
+            <li class="nav-item">
+                <button class="nav-link rounded-pill px-4 fw-bold ${activeTab === 'tabDuyet' ? 'active' : ''}" onclick="switchGVSVTab('tabDuyet')">
+                    <i class="fa-solid fa-user-clock me-1"></i> Duyệt Sinh Viên <span id="countChoDuyetBadge" class="badge bg-danger rounded-pill ms-1">0</span>
+                </button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link rounded-pill px-4 fw-bold ${activeTab === 'tabHuongDan' ? 'active' : ''}" onclick="switchGVSVTab('tabHuongDan')">
+                    <i class="fa-solid fa-list-check me-1"></i> Danh Sách Sinh Viên Hướng Dẫn & Chấm Điểm
+                </button>
+            </li>
+        </ul>
+
+        <div id="gvTabContentArea">
+            <div class="text-center py-5"><div class="spinner-border text-primary"></div></div>
         </div>
     `;
 
     try {
-        const list = await fetchAPI('/project-process/gv-dang-ky');
-        const tbody = document.getElementById('svDangKyTableBody');
-        if (!list || list.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="6" class="text-center text-muted py-4">Chưa có sinh viên nào đăng ký đề tài của bạn.</td></tr>`;
+        // Tải song song cả 2 nguồn dữ liệu
+        [cacheGVDangKyList, cacheGVChamDiemList] = await Promise.all([
+            fetchAPI('/project-process/gv-dang-ky'),
+            fetchAPI('/project-process/gv-cham-diem')
+        ]);
+
+        // Cập nhật số lượng chờ duyệt lên Badge
+        const choDuyetCount = cacheGVDangKyList.filter(dk => dk.trang_thai === 'cho_duyet').length;
+        const countBadge = document.getElementById('countChoDuyetBadge');
+        if (countBadge) countBadge.textContent = choDuyetCount;
+
+        renderGVSVTabContent(activeTab);
+    } catch (error) {
+        document.getElementById('gvTabContentArea').innerHTML = `<div class="alert alert-danger">${error.message}</div>`;
+    }
+}
+
+function switchGVSVTab(tabName) {
+    loadGVDanhSachSinhVien(tabName);
+}
+
+// Render nội dung của 2 Tab Sinh viên Giảng viên
+function renderGVSVTabContent(activeTab) {
+    const area = document.getElementById('gvTabContentArea');
+    if (!area) return;
+
+    if (activeTab === 'tabDuyet') {
+        const listChoDuyet = cacheGVDangKyList.filter(dk => dk.trang_thai === 'cho_duyet');
+        if (listChoDuyet.length === 0) {
+            area.innerHTML = `<div class="card p-5 text-center border-0 shadow-sm rounded-4 text-muted"><i class="fa-solid fa-circle-check fs-1 text-success mb-2"></i><p class="m-0 fw-bold">Hiện không có yêu cầu đăng ký nào đang chờ duyệt.</p></div>`;
             return;
         }
-        tbody.innerHTML = list.map((dk, index) => {
-            const sv = dk.sinh_vien || {};
-            const dt = dk.de_tai || {};
-            let status = '<span class="badge bg-warning text-dark px-3 py-2">Chờ duyệt</span>';
-            if (dk.trang_thai === 'dang_thuc_hien') status = '<span class="badge bg-success px-3 py-2">Đang thực hiện</span>';
-            if (dk.trang_thai === 'da_hoan_thanh') status = '<span class="badge bg-info text-dark px-3 py-2">Hoàn thành</span>';
-            if (dk.trang_thai === 'da_huy') status = '<span class="badge bg-danger px-3 py-2">Đã từ chối</span>';
 
-            return `
-                <tr>
-                    <td>${index + 1}</td>
-                    <td class="fw-bold text-primary">${sv.ma_so || 'N/A'}</td>
-                    <td class="fw-bold text-dark">${sv.ho_ten || 'N/A'}</td>
-                    <td style="max-width: 250px;">${dt.ten_de_tai || 'N/A'}</td>
-                    <td>${status}</td>
-                    <td>
-                        ${dk.trang_thai === 'cho_duyet' ? `
-                            <button class="btn btn-sm btn-success rounded-pill px-3 fw-bold me-1" onclick="duyetSVAction('${dk._id}', 'dang_thuc_hien')"><i class="fa-solid fa-check"></i> Duyệt</button>
-                            <button class="btn btn-sm btn-outline-danger rounded-pill px-3 fw-bold" onclick="duyetSVAction('${dk._id}', 'da_huy')"><i class="fa-solid fa-xmark"></i> Từ chối</button>
-                        ` : '<span class="text-muted small">Đã xử lý</span>'}
-                    </td>
-                </tr>
-            `;
-        }).join('');
-    } catch (error) {
-        document.getElementById('svDangKyTableBody').innerHTML = `<tr><td colspan="6" class="text-danger text-center py-3">${error.message}</td></tr>`;
+        area.innerHTML = `
+            <div class="table-responsive">
+                <table class="table table-hover align-middle border rounded-3 overflow-hidden">
+                    <thead class="table-light">
+                        <tr><th>#</th><th>MSSV</th><th>Họ và Tên SV</th><th>Tên Đề Tài Đăng Ký</th><th>Trạng Thái</th><th>Thao Tác</th></tr>
+                    </thead>
+                    <tbody>
+                        ${listChoDuyet.map((dk, index) => {
+                            const sv = dk.sinh_vien || {};
+                            const dt = dk.de_tai || {};
+                            return `
+                                <tr>
+                                    <td>${index + 1}</td>
+                                    <td class="fw-bold text-primary">${sv.ma_so || 'N/A'}</td>
+                                    <td class="fw-bold text-dark">${sv.ho_ten || 'N/A'}</td>
+                                    <td style="max-width: 250px;">${dt.ten_de_tai || 'N/A'}</td>
+                                    <td><span class="badge bg-warning text-dark px-3 py-2">Chờ duyệt</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-success rounded-pill px-3 fw-bold me-1" onclick="duyetSVAction('${dk._id}', 'dang_thuc_hien')">
+                                            <i class="fa-solid fa-check"></i> Duyệt
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-danger rounded-pill px-3 fw-bold" onclick="duyetSVAction('${dk._id}', 'da_huy')">
+                                            <i class="fa-solid fa-xmark"></i> Từ chối
+                                        </button>
+                                    </td>
+                                </tr>
+                            `;
+                        }).join('')}
+                    </tbody>
+                </table>
+            </div>
+        `;
+    } else {
+        // Tab Danh sách sinh viên hướng dẫn & Chấm điểm
+        if (!cacheGVChamDiemList || cacheGVChamDiemList.length === 0) {
+            area.innerHTML = `<div class="card p-5 text-center border-0 shadow-sm rounded-4 text-muted"><i class="fa-solid fa-user-group fs-1 mb-2"></i><p class="m-0 fw-bold">Chưa có sinh viên nào trong danh sách hướng dẫn.</p></div>`;
+            return;
+        }
+
+        area.innerHTML = `
+            <div class="table-responsive">
+                <table class="table table-hover align-middle border rounded-3 overflow-hidden">
+                    <thead class="table-light">
+                        <tr><th>#</th><th>MSSV</th><th>Họ Tên SV</th><th>File Báo Cáo Mới Nhất</th><th>Điểm HD</th><th>Thao Tác</th></tr>
+                    </thead>
+                    <tbody>
+                        ${cacheGVChamDiemList.map((item, index) => {
+                            const sv = item.dangKy?.sinh_vien || {};
+                            const lastBc = item.lastBaoCao;
+                            const bd = item.bangDiem;
+                            const isDaCham = !!bd;
+
+                            return `
+                                <tr>
+                                    <td>${index + 1}</td>
+                                    <td class="fw-bold text-primary">${sv.ma_so || 'N/A'}</td>
+                                    <td class="fw-bold text-dark">${sv.ho_ten || 'N/A'}</td>
+                                    <td>
+                                        ${lastBc ? `
+                                            <a href="http://localhost:5000${lastBc.file_url}" target="_blank" class="btn btn-sm btn-outline-primary rounded-pill px-3">
+                                                <i class="fa-solid fa-download me-1"></i> Lần ${lastBc.lan_nop} (${new Date(lastBc.submitted_at).toLocaleDateString('vi-VN')})
+                                            </a>
+                                        ` : '<span class="badge bg-secondary">Chưa nộp file</span>'}
+                                    </td>
+                                    <td>
+                                        ${isDaCham ? `<span class="fw-bold text-success fs-5">${bd.diem_huong_dan}</span>` : '<span class="badge bg-light text-muted border">Chưa chấm</span>'}
+                                    </td>
+                                    <td>
+                                        ${isDaCham ? `
+                                            <span class="badge bg-success-subtle text-success px-3 py-2 rounded-pill fw-bold">
+                                                <i class="fa-solid fa-circle-check me-1"></i> Đã hoàn thành
+                                            </span>
+                                        ` : `
+                                            <button class="btn btn-sm btn-primary rounded-pill px-3 fw-bold" onclick="openModalChamDiemDetail('${item.dangKy._id}')">
+                                                <i class="fa-solid fa-pen-nib me-1"></i> Chấm điểm
+                                            </button>
+                                        `}
+                                    </td>
+                                </tr>
+                            `;
+                        }).join('')}
+                    </tbody>
+                </table>
+            </div>
+        `;
     }
+}
+
+// Hàm mở Modal Chấm điểm chi tiết (Đã fix lỗi cú pháp nháy đơn)
+function openModalChamDiemDetail(dangKyId) {
+    const item = cacheGVChamDiemList.find(x => x.dangKy._id === dangKyId);
+    if (!item) return;
+
+    const dk = item.dangKy || {};
+    const sv = dk.sinh_vien || {};
+    const dt = dk.de_tai || {};
+    const lastBc = item.lastBaoCao;
+
+    // 1. Điền dữ liệu chi tiết vào Modal
+    document.getElementById('chamDiemDangKyId').value = dangKyId;
+    document.getElementById('modalChamDiemTenDeTai').textContent = dt.ten_de_tai || 'Chưa cập nhật tên đề tài';
+    document.getElementById('modalChamDiemMoTa').textContent = dt.mo_ta || 'Không có mô tả chi tiết.';
+    document.getElementById('modalChamDiemSV').textContent = `${sv.ho_ten || 'N/A'} (${sv.ma_so || ''}) - ${sv.email || ''}`;
+
+    const dot = dt.dot_do_an || {};
+    document.getElementById('modalChamDiemDot').textContent = dot.ten_dot || 'Đợt Đồ Án';
+    document.getElementById('modalChamDiemDeadline').textContent = dot.han_nop_bao_cao ? new Date(dot.han_nop_bao_cao).toLocaleString('vi-VN') : 'Không giới hạn';
+
+    // 2. Hiển thị danh sách file nộp của sinh viên
+    const listFileArea = document.getElementById('modalChamDiemListBaoCao');
+    if (lastBc) {
+        listFileArea.innerHTML = `
+            <div class="d-flex justify-content-between align-items-center bg-light p-2 px-3 rounded-3 border">
+                <div>
+                    <strong class="text-primary"><i class="fa-solid fa-file-lines me-1"></i> Lần nộp ${lastBc.lan_nop}:</strong> ${lastBc.ten_file_goc}
+                    <div class="text-muted" style="font-size: 0.75rem;">Thời gian nộp: ${new Date(lastBc.submitted_at).toLocaleString('vi-VN')}</div>
+                </div>
+                <a href="http://localhost:5000${lastBc.file_url}" target="_blank" class="btn btn-sm btn-primary rounded-pill px-3 fw-bold">
+                    <i class="fa-solid fa-download me-1"></i> Tải về xem
+                </a>
+            </div>
+        `;
+    } else {
+        listFileArea.innerHTML = `<div class="alert alert-warning m-0 py-2 small"><i class="fa-solid fa-triangle-exclamation me-1"></i> Sinh viên chưa nộp tệp báo cáo nào lên hệ thống!</div>`;
+    }
+
+    // 3. Reset form nhập điểm
+    document.getElementById('diemHuongDanInput').value = '';
+    document.getElementById('nhanXetInput').value = '';
+
+    const modal = new bootstrap.Modal(document.getElementById('modalChamDiem'));
+    modal.show();
+
+    // 4. Xử lý lưu điểm
+    document.getElementById('formChamDiem').onsubmit = async function(e) {
+        e.preventDefault();
+        const diem = document.getElementById('diemHuongDanInput').value;
+        const nhanXet = document.getElementById('nhanXetInput').value;
+
+        if (!confirm(`Xác nhận lưu điểm: ${diem} và khóa kết quả cho sinh viên này?`)) return;
+
+        try {
+            const res = await fetchAPI('/project-process/cham-diem', 'POST', {
+                dang_ky_id: dangKyId,
+                diem_huong_dan: diem,
+                nhan_xet_huong_dan: nhanXet
+            });
+            alert(`🎉 ${res.message}`);
+            modal.hide();
+            loadGVDanhSachSinhVien('tabHuongDan'); // Reload lại tab hướng dẫn
+        } catch (error) {
+            alert('Lỗi: ' + error.message);
+        }
+    };
 }
 
 async function duyetSVAction(id, status) {
@@ -622,143 +772,29 @@ async function duyetSVAction(id, status) {
     try {
         const res = await fetchAPI(`/project-process/duyet-dang-ky/${id}`, 'PUT', { trang_thai: status });
         alert(res.message);
-        loadGVSinhVien();
+        loadGVDanhSachSinhVien('tabDuyet');
     } catch (error) { alert(error.message); }
 }
 
-// Chấm điểm đồ án
-let cacheChamDiemList = [];
+function openModalChamDiem(dangKyId, diem, nhanXet) {
+    document.getElementById('chamDiemDangKyId').value = dangKyId;
+    document.getElementById('diemHuongDanInput').value = diem || '';
+    document.getElementById('nhanXetInput').value = nhanXet || '';
 
-async function loadGVChamDiem() {
-    const mainContent = document.getElementById('mainContent');
-    mainContent.innerHTML = `
-        <h4 class="fw-bold text-primary mb-4"><i class="fa-solid fa-pen-nib me-2"></i>Đánh Giá & Chấm Điểm Báo Cáo</h4>
-        <div class="table-responsive">
-            <table class="table table-hover align-middle border rounded-3 overflow-hidden">
-                <thead class="table-light">
-                    <tr><th>#</th><th>MSSV</th><th>Họ Tên SV</th><th>File Báo Cáo</th><th>Điểm HD</th><th></th></tr>
-                </thead>
-                <tbody id="chamDiemTableBody">
-                    <tr><td colspan="6" class="text-center py-4"><div class="spinner-border text-primary"></div></td></tr>
-                </tbody>
-            </table>
-        </div>
-    `;
+    const modal = new bootstrap.Modal(document.getElementById('modalChamDiem'));
+    modal.show();
 
-    try {
-        cacheChamDiemList = await fetchAPI('/project-process/gv-cham-diem');
-        const tbody = document.getElementById('chamDiemTableBody');
-        if (!cacheChamDiemList || cacheChamDiemList.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="6" class="text-center text-muted py-4">Chưa có sinh viên nào trong danh sách hướng dẫn.</td></tr>`;
-            return;
-        }
-        tbody.innerHTML = cacheChamDiemList.map((item, index) => {
-            const sv = item.dangKy.sinh_vien || {};
-            const lastBc = item.lastBaoCao;
-            const bd = item.bangDiem;
-
-            return `
-                <tr class="cursor-pointer" style="cursor:pointer" onclick="xemChiTietChamDiem(${index})">
-                    <td>${index + 1}</td>
-                    <td class="fw-bold text-primary">${sv.ma_so || 'N/A'}</td>
-                    <td class="fw-bold text-dark">${sv.ho_ten || 'N/A'}</td>
-                    <td>
-                        ${lastBc ? `<span class="badge bg-light text-dark border">Lần ${lastBc.lan_nop} · ${new Date(lastBc.submitted_at).toLocaleDateString('vi-VN')}</span>` : '<span class="badge bg-secondary">Chưa nộp file</span>'}
-                    </td>
-                    <td>${bd ? `<span class="fw-bold text-success fs-5">${bd.diem_huong_dan}</span>` : '<span class="text-muted">Chưa chấm</span>'}</td>
-                    <td class="text-end">
-                        <button class="btn btn-sm btn-primary rounded-pill px-3 fw-bold" onclick="event.stopPropagation(); xemChiTietChamDiem(${index})">
-                            <i class="fa-solid fa-eye me-1"></i> Xem chi tiết
-                        </button>
-                    </td>
-                </tr>
-            `;
-        }).join('');
-    } catch (error) {
-        document.getElementById('chamDiemTableBody').innerHTML = `<tr><td colspan="6" class="text-danger text-center py-3">${error.message}</td></tr>`;
-    }
-}
-
-// Xem chi tiết đề tài + chấm điểm, đồng bộ giao diện giống trang Sinh viên
-function xemChiTietChamDiem(index) {
-    const item = cacheChamDiemList[index];
-    if (!item) return;
-
-    const sv = item.dangKy.sinh_vien || {};
-    const deTai = item.dangKy.de_tai || {};
-    const dot = deTai.dot_do_an || {};
-    const bd = item.bangDiem;
-    const listBc = item.listBaoCao || (item.lastBaoCao ? [item.lastBaoCao] : []);
-
-    const mainContent = document.getElementById('mainContent');
-    mainContent.innerHTML = `
-        <button class="btn btn-sm btn-outline-secondary rounded-pill px-3 mb-3" onclick="loadGVChamDiem()">
-            <i class="fa-solid fa-arrow-left me-1"></i> Quay lại danh sách
-        </button>
-
-        <div class="row g-4">
-            <div class="col-md-7">
-                <div class="card p-4 border-0 shadow-sm rounded-4 mb-4">
-                    <div class="d-flex justify-content-between align-items-start">
-                        <h5 class="fw-bold text-primary m-0"><i class="fa-solid fa-file-lines me-2"></i>${deTai.ten_de_tai || 'N/A'}</h5>
-                        <span class="badge ${item.dangKy.trang_thai === 'da_hoan_thanh' ? 'bg-info' : 'bg-primary'} rounded-pill px-3 py-2">${item.dangKy.trang_thai === 'da_hoan_thanh' ? 'Đã hoàn thành' : 'Đang thực hiện'}</span>
-                    </div>
-                    <p class="text-muted mt-2 mb-3">${deTai.mo_ta || ''}</p>
-                    <hr>
-                    <div class="row g-2">
-                        <div class="col-6"><strong>Sinh viên:</strong> ${sv.ho_ten || 'N/A'} (${sv.ma_so || 'N/A'})</div>
-                        <div class="col-6"><strong>Email:</strong> ${sv.email || 'N/A'}</div>
-                        <div class="col-6"><strong>Đợt đồ án:</strong> ${dot.ten_dot || 'N/A'}</div>
-                        <div class="col-12 mt-2"><strong>Hạn chót nộp báo cáo:</strong> <span class="text-danger fw-bold">${dot.han_nop_bao_cao ? new Date(dot.han_nop_bao_cao).toLocaleString('vi-VN') : 'N/A'}</span></div>
-                    </div>
-                </div>
-
-                <div class="card p-4 border-0 shadow-sm rounded-4">
-                    <h5 class="fw-bold text-dark mb-3"><i class="fa-solid fa-history me-2 text-info"></i>Lịch Sử Nộp Bài</h5>
-                    ${listBc.length > 0 ? `
-                        <ul class="list-group list-group-flush small">
-                            ${listBc.map(b => `
-                                <li class="list-group-item d-flex justify-content-between align-items-center px-0">
-                                    <div><strong>Lần ${b.lan_nop}:</strong> ${b.ten_file_goc}<br><small class="text-muted">${new Date(b.submitted_at).toLocaleString('vi-VN')}</small></div>
-                                    <a href="http://localhost:5000${b.file_url}" target="_blank" class="btn btn-sm btn-light text-primary"><i class="fa-solid fa-download"></i></a>
-                                </li>
-                            `).join('')}
-                        </ul>
-                    ` : '<div class="text-muted small">Sinh viên chưa nộp bài lần nào.</div>'}
-                </div>
-            </div>
-
-            <div class="col-md-5">
-                <div class="card p-4 border-0 shadow-sm rounded-4">
-                    <h5 class="fw-bold text-dark mb-3"><i class="fa-solid fa-award me-2 text-warning"></i>Chấm Điểm & Nhận Xét</h5>
-                    <form id="formChamDiemChiTiet">
-                        <input type="hidden" id="chiTietDangKyId" value="${item.dangKy._id}">
-                        <div class="mb-3">
-                            <label class="form-label fw-bold text-muted">Điểm Hướng Dẫn (0 - 10)</label>
-                            <input type="number" id="chiTietDiemInput" class="form-control fw-bold text-success fs-5" step="0.1" min="0" max="10" required placeholder="8.5" value="${bd ? bd.diem_huong_dan : ''}">
-                        </div>
-                        <div class="mb-4">
-                            <label class="form-label fw-bold text-muted">Nhận Xét Của Giảng Viên</label>
-                            <textarea id="chiTietNhanXetInput" class="form-control" rows="4" placeholder="Nhận xét thái độ, chất lượng báo cáo...">${bd ? bd.nhan_xet_huong_dan : ''}</textarea>
-                        </div>
-                        <button type="submit" class="btn btn-success rounded-pill px-4 fw-bold w-100"><i class="fa-solid fa-floppy-disk me-1"></i> Lưu Kết Quả</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    `;
-
-    document.getElementById('formChamDiemChiTiet').onsubmit = async function(e) {
+    document.getElementById('formChamDiem').onsubmit = async function(e) {
         e.preventDefault();
         try {
             const res = await fetchAPI('/project-process/cham-diem', 'POST', {
-                dang_ky_id: document.getElementById('chiTietDangKyId').value,
-                diem_huong_dan: document.getElementById('chiTietDiemInput').value,
-                nhan_xet_huong_dan: document.getElementById('chiTietNhanXetInput').value
+                dang_ky_id: document.getElementById('chamDiemDangKyId').value,
+                diem_huong_dan: document.getElementById('diemHuongDanInput').value,
+                nhan_xet_huong_dan: document.getElementById('nhanXetInput').value
             });
             alert(res.message);
-            await loadGVChamDiem();
-            xemChiTietChamDiem(index);
+            modal.hide();
+            loadGVDanhSachSinhVien('tabHuongDan');
         } catch (error) { alert(error.message); }
     };
 }
@@ -827,52 +863,102 @@ async function duyetGiaHanAction(id, status) {
 }
 
 // ========================================================
-// 3. PHÂN HỆ SINH VIÊN: TRA CỨU, ĐĂNG KÝ, NỘP BÁO CÁO
+// 3. PHÂN HỆ SINH VIÊN (CARD LAYOUT THEO BÁO CÁO)
 // ========================================================
+let cacheListSVDeTai = [];
+
 async function loadSVDanhSachDeTai() {
     const mainContent = document.getElementById('mainContent');
     mainContent.innerHTML = `
-        <h4 class="fw-bold text-primary mb-4"><i class="fa-solid fa-list-check me-2"></i>Tra Cứu & Đăng Ký Đề Tài</h4>
-        <div class="table-responsive">
-            <table class="table table-hover align-middle border rounded-3 overflow-hidden">
-                <thead class="table-light">
-                    <tr><th>#</th><th>Tên Đề Tài</th><th>Đợt Đồ Án</th><th>Giảng Viên Hướng Dẫn</th><th>Số Lượng</th><th>Thao Tác</th></tr>
-                </thead>
-                <tbody id="svDeTaiTableBody">
-                    <tr><td colspan="6" class="text-center py-4"><div class="spinner-border text-primary"></div></td></tr>
-                </tbody>
-            </table>
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h4 class="fw-bold text-primary m-0"><i class="fa-solid fa-list-check me-2"></i>Tra Cứu & Đăng Ký Đề Tài</h4>
+        </div>
+
+        <!-- Bộ Lọc Tìm Kiếm Card Realtime -->
+        <div class="row g-3 mb-4 bg-light p-3 rounded-4 border">
+            <div class="col-md-12">
+                <div class="input-group">
+                    <span class="input-group-text bg-white"><i class="fa-solid fa-magnifying-glass text-muted"></i></span>
+                    <input type="text" id="searchSVDeTaiCardInput" class="form-control" placeholder="Nhập tên đề tài, giảng viên hoặc từ khóa mô tả..." oninput="filterSVDeTaiCards()">
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4" id="deTaiCardContainer">
+            <div class="col-12 text-center py-5"><div class="spinner-border text-primary"></div></div>
         </div>
     `;
 
     try {
-        const list = await fetchAPI('/de-tai');
-        const tbody = document.getElementById('svDeTaiTableBody');
-        if (!list || list.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="6" class="text-center text-muted py-4">Hiện tại chưa có đề tài nào mở.</td></tr>`;
-            return;
-        }
-        tbody.innerHTML = list.map((dt, index) => {
-            const gv = dt.giang_vien || {};
-            const dot = dt.dot_do_an || {};
-            return `
-                <tr>
-                    <td>${index + 1}</td>
-                    <td class="fw-bold text-primary" style="max-width: 250px;">${dt.ten_de_tai}</td>
-                    <td><span class="badge bg-info text-dark">${dot.ten_dot || 'Chưa gán'}</span></td>
-                    <td><strong>${gv.ho_ten || 'N/A'}</strong><br><small class="text-muted">${gv.email || ''}</small></td>
-                    <td><span class="badge bg-secondary">${dt.so_luong_sv_toi_da} SV</span></td>
-                    <td>
-                        <button class="btn btn-primary btn-sm rounded-pill px-4 fw-bold" onclick="dangKyDeTaiAction('${dt._id}', '${escapeHtml(dt.ten_de_tai)}')">
-                            <i class="fa-solid fa-hand-pointer me-1"></i> Đăng Ký
-                        </button>
-                    </td>
-                </tr>
-            `;
-        }).join('');
+        cacheListSVDeTai = await fetchAPI('/de-tai');
+        renderSVDeTaiCards(cacheListSVDeTai);
     } catch (error) {
-        document.getElementById('svDeTaiTableBody').innerHTML = `<tr><td colspan="6" class="text-danger text-center py-3">${error.message}</td></tr>`;
+        document.getElementById('deTaiCardContainer').innerHTML = `<div class="col-12"><div class="alert alert-danger">${error.message}</div></div>`;
     }
+}
+
+function renderSVDeTaiCards(listDeTai) {
+    const container = document.getElementById('deTaiCardContainer');
+    if (!container) return;
+
+    if (!listDeTai || listDeTai.length === 0) {
+        container.innerHTML = `
+            <div class="col-12">
+                <div class="card p-5 text-center border-0 shadow-sm rounded-4 text-muted">
+                    <i class="fa-solid fa-box-open fs-1 mb-2"></i>
+                    <p class="m-0 fw-bold">Hiện không có đề tài nào phù hợp với tìm kiếm.</p>
+                </div>
+            </div>
+        `;
+        return;
+    }
+
+    container.innerHTML = listDeTai.map(dt => {
+        const gv = dt.giang_vien || {};
+        const dot = dt.dot_do_an || {};
+        return `
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100 border-0 shadow-sm rounded-4 p-4 d-flex flex-column justify-content-between position-relative" style="transition: transform 0.2s;">
+                    <div>
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <span class="badge bg-primary-subtle text-primary rounded-pill px-3 py-1 fw-bold">${dot.ten_dot || 'Đợt Đồ Án'}</span>
+                            <span class="badge bg-secondary-subtle text-secondary rounded-pill px-2 py-1"><i class="fa-solid fa-users me-1"></i>${dt.so_luong_sv_toi_da} SV</span>
+                        </div>
+                        <h5 class="fw-bold text-dark mb-2 mt-2">${dt.ten_de_tai}</h5>
+                        <p class="text-muted small mb-3 text-truncate-3" style="display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">
+                            ${dt.mo_ta || 'Không có mô tả chi tiết.'}
+                        </p>
+                    </div>
+
+                    <div class="pt-3 border-top mt-2">
+                        <div class="d-flex align-items-center justify-content-between mb-3">
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="avatar-circle" style="width: 32px; height: 32px; font-size: 0.8rem;">${gv.ho_ten ? gv.ho_ten.charAt(0) : 'G'}</div>
+                                <div class="small">
+                                    <div class="fw-bold text-dark">${gv.ho_ten || 'Giảng viên'}</div>
+                                    <div class="text-muted" style="font-size: 0.75rem;">${gv.email || ''}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <button class="btn btn-primary w-100 rounded-pill fw-bold shadow-sm" onclick="dangKyDeTaiAction('${dt._id}', '${escapeHtml(dt.ten_de_tai)}')">
+                            <i class="fa-solid fa-hand-pointer me-1"></i> Đăng Ký Đề Tài
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+function filterSVDeTaiCards() {
+    const keyword = (document.getElementById('searchSVDeTaiCardInput')?.value || '').toLowerCase().trim();
+    const filtered = cacheListSVDeTai.filter(dt => {
+        const matchTitle = dt.ten_de_tai.toLowerCase().includes(keyword);
+        const matchDesc = dt.mo_ta && dt.mo_ta.toLowerCase().includes(keyword);
+        const matchGV = dt.giang_vien && dt.giang_vien.ho_ten && dt.giang_vien.ho_ten.toLowerCase().includes(keyword);
+        return matchTitle || matchDesc || matchGV;
+    });
+    renderSVDeTaiCards(filtered);
 }
 
 async function dangKyDeTaiAction(deTaiId, tenDeTai) {
@@ -880,8 +966,11 @@ async function dangKyDeTaiAction(deTaiId, tenDeTai) {
     try {
         const res = await fetchAPI('/project-process/dang-ky', 'POST', { de_tai_id: deTaiId });
         alert(res.message);
+        // Chuyển sang tab Đề tài của tôi
         loadSVDeTaiCuaToi();
-    } catch (error) { alert('Lỗi: ' + error.message); }
+    } catch (error) {
+        alert('Lỗi: ' + error.message);
+    }
 }
 
 async function loadSVDeTaiCuaToi() {
@@ -1015,28 +1104,62 @@ function openModalGiaHan() {
 }
 
 // ========================================================
-// 4. THÔNG TIN CÁ NHÂN (DÙNG CHUNG)
+// 4. THÔNG TIN CÁ NHÂN (PROFILE CÓ AVATAR & CHỨC VỤ)
 // ========================================================
 function loadProfile() {
     const user = JSON.parse(localStorage.getItem('user')) || {};
     let roleText = 'SINH VIÊN';
-    if (user.vai_tro === 'admin') roleText = 'QUẢN TRỊ VIÊN (ADMIN)';
-    if (user.vai_tro === 'giang_vien') roleText = 'GIẢNG VIÊN';
+    let roleBadgeClass = 'bg-primary';
+    if (user.vai_tro === 'admin') { roleText = 'QUẢN TRỊ VIÊN HỆ THỐNG'; roleBadgeClass = 'bg-danger'; }
+    if (user.vai_tro === 'giang_vien') { roleText = 'CÁN BỘ GIẢNG VIÊN'; roleBadgeClass = 'bg-indigo text-white'; }
 
     const mainContent = document.getElementById('mainContent');
     mainContent.innerHTML = `
         <div class="d-flex align-items-center justify-content-between mb-4">
-            <h4 class="fw-bold text-primary m-0"><i class="fa-solid fa-id-card me-2"></i>Thông tin cá nhân</h4>
+            <h4 class="fw-bold text-primary m-0"><i class="fa-solid fa-id-card me-2"></i>Thông Tin Cá Nhân</h4>
             <button class="btn btn-primary rounded-pill px-4 fw-bold shadow-sm" onclick="showModalCapNhatProfile()">
                 <i class="fa-solid fa-pen-to-square me-1"></i> Cập nhật thông tin
             </button>
         </div>
-        <div class="card p-4 border-0 shadow-sm rounded-4">
-            <div class="row g-3">
-                <div class="col-md-6"><label class="form-label fw-bold text-muted">Mã số:</label><input type="text" class="form-control bg-light fw-bold text-primary" value="${user.ma_so || ''}" readonly></div>
-                <div class="col-md-6"><label class="form-label fw-bold text-muted">Họ và tên:</label><input type="text" class="form-control bg-light fw-bold" value="${user.ho_ten || ''}" readonly></div>
-                <div class="col-md-6"><label class="form-label fw-bold text-muted">Email trường:</label><input type="text" class="form-control bg-light" value="${user.email || ''}" readonly></div>
-                <div class="col-md-6"><label class="form-label fw-bold text-muted">Vai trò:</label><input type="text" class="form-control bg-light" value="${roleText}" readonly></div>
+
+        <div class="row g-4">
+            <!-- Cột trái: Khung Avatar & Chức vụ -->
+            <div class="col-md-4">
+                <div class="card p-4 border-0 shadow-sm rounded-4 text-center h-100 bg-white">
+                    <div class="avatar-circle mx-auto mb-3" style="width: 100px; height: 100px; font-size: 2.5rem; background: linear-gradient(135deg, #2563eb, #1d4ed8);">
+                        ${user.ho_ten ? user.ho_ten.charAt(0).toUpperCase() : 'U'}
+                    </div>
+                    <h5 class="fw-bold text-dark mb-1">${user.ho_ten || 'Họ và tên'}</h5>
+                    <p class="text-muted small mb-3">${user.ma_so || ''}</p>
+                    <div>
+                        <span class="badge ${roleBadgeClass} px-3 py-2 rounded-pill fw-bold" style="${user.vai_tro === 'giang_vien' ? 'background:#4338ca;' : ''}">${roleText}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Cột phải: Chi tiết hồ sơ -->
+            <div class="col-md-8">
+                <div class="card p-4 border-0 shadow-sm rounded-4 h-100 bg-white">
+                    <h5 class="fw-bold text-dark mb-4"><i class="fa-solid fa-user-gear me-2 text-primary"></i>Chi Tiết Hồ Sơ</h5>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold text-muted small">Mã số định danh:</label>
+                            <input type="text" class="form-control bg-light fw-bold text-primary" value="${user.ma_so || ''}" readonly>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold text-muted small">Họ và tên:</label>
+                            <input type="text" class="form-control bg-light fw-bold" value="${user.ho_ten || ''}" readonly>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold text-muted small">Địa chỉ Email trường:</label>
+                            <input type="text" class="form-control bg-light" value="${user.email || ''}" readonly>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold text-muted small">Số điện thoại liên hệ:</label>
+                            <input type="text" class="form-control bg-light" value="${user.so_dien_thoai || 'Chưa cập nhật'}" readonly>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     `;

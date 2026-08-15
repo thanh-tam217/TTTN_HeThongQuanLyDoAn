@@ -300,27 +300,54 @@ exports.dangKyDeTai = async (req, res) => {
         const { de_tai_id } = req.body;
         const sinh_vien_id = req.user.id;
 
-        // Kiểm tra SV đã có đề tài active chưa
-        const activeRegistration = await DangKy.findOne({
+        if (!de_tai_id) {
+            return res.status(400).json({ message: 'Vui lòng cung cấp ID đề tài cần đăng ký!' });
+        }
+
+        // 1. Kiểm tra các lượt đăng ký trước của sinh viên này
+        const existingRegistrations = await DangKy.find({
             sinh_vien: sinh_vien_id,
             trang_thai: { $in: ['cho_duyet', 'dang_thuc_hien', 'da_hoan_thanh'] }
+        }).populate({
+            path: 'de_tai',
+            populate: { path: 'dot_do_an' }
         });
 
-        if (activeRegistration) {
-            return res.status(400).json({ message: 'Bạn đã đăng ký một đề tài trong hệ thống!' });
+        for (const reg of existingRegistrations) {
+            if (reg.trang_thai === 'cho_duyet') {
+                return res.status(400).json({ message: 'Bạn đang có một đề tài đang chờ Giảng viên duyệt!' });
+            }
+            if (reg.trang_thai === 'dang_thuc_hien') {
+                return res.status(400).json({ message: 'Bạn đang thực hiện một đề tài khác!' });
+            }
+            if (reg.trang_thai === 'da_hoan_thanh' && reg.de_tai && reg.de_tai.dot_do_an) {
+                const dot = reg.de_tai.dot_do_an;
+                const now = new Date();
+                const ngayKetThucDot = new Date(dot.ngay_ket_thuc || dot.han_nop_bao_cao);
+                if (now < ngayKetThucDot && dot.trang_thai === true) {
+                    return res.status(400).json({ 
+                        message: `Bạn đã hoàn thành đề tài trong "${dot.ten_dot}". Đợt này chưa kết thúc nên chưa thể đăng ký đề tài khác!` 
+                    });
+                }
+            }
         }
 
+        // 2. Kiểm tra đề tài muốn đăng ký
         const deTai = await DeTai.findById(de_tai_id);
-        if (!deTai) return res.status(404).json({ message: 'Không tìm thấy đề tài!' });
+        if (!deTai) {
+            return res.status(404).json({ message: 'Không tìm thấy đề tài!' });
+        }
         if (deTai.trang_thai === 'da_khoa') {
-            return res.status(400).json({ message: 'Đề tài này đã khóa nhận sinh viên!' });
+            return res.status(400).json({ message: 'Đề tài này đã ngưng nhận sinh viên!' });
         }
 
-        const countAccepted = await DangKy.countDocuments({ de_tai: de_tai_id, trang_thai: 'dang_thuc_hien' });
+        // 3. Kiểm tra số lượng tối đa
+        const countAccepted = await DangKy.countDocuments({ de_tai: de_tai_id, trang_thai: { $in: ['cho_duyet', 'dang_thuc_hien'] } });
         if (countAccepted >= deTai.so_luong_sv_toi_da) {
-            return res.status(400).json({ message: 'Đề tài đã nhận đủ số lượng sinh viên tối đa!' });
+            return res.status(400).json({ message: `Đề tài đã nhận đủ số lượng sinh viên tối đa (${deTai.so_luong_sv_toi_da} SV)!` });
         }
 
+        // 4. Tạo bản ghi đăng ký mới
         const newDangKy = new DangKy({
             sinh_vien: sinh_vien_id,
             de_tai: de_tai_id,
@@ -328,9 +355,13 @@ exports.dangKyDeTai = async (req, res) => {
         });
         await newDangKy.save();
 
-        res.status(201).json({ message: 'Đăng ký đề tài thành công! Vui lòng chờ Giảng viên duyệt.', dang_ky: newDangKy });
+        res.status(201).json({ 
+            message: 'Đăng ký đề tài thành công! Vui lòng chờ Giảng viên phê duyệt.', 
+            dang_ky: newDangKy 
+        });
     } catch (error) {
-        res.status(500).json({ message: 'Lỗi server:', error: error.message });
+        console.error('Lỗi đăng ký đề tài:', error);
+        res.status(500).json({ message: error.message || 'Lỗi server khi đăng ký đề tài!' });
     }
 };
 
