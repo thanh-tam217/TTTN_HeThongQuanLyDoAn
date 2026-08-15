@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 function renderHeaderInfo(user) {
     document.getElementById('userName').textContent = user.ho_ten;
-    document.getElementById('welcomeTitle').textContent = `Chào mừng, ${user.ho_ten}! 👋`;
+    document.getElementById('welcomeTitle').textContent = `Xin chào, ${user.ho_ten}!`;
     document.getElementById('userAvatar').textContent = user.ho_ten.charAt(0).toUpperCase();
 
     const roleBadge = document.getElementById('roleBadge');
@@ -67,15 +67,15 @@ async function loadAdminDotDoAn() {
     const mainContent = document.getElementById('mainContent');
     mainContent.innerHTML = `
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <h4 class="fw-bold text-primary m-0"><i class="fa-solid fa-calendar-days me-2"></i>Quản lý Đợt Đồ án</h4>
+            <h4 class="fw-bold text-primary m-0"></i>QUẢN LÝ ĐỢT ĐỒ ÁN</h4>
             <button class="btn btn-primary rounded-pill px-4 fw-bold" onclick="showModalTaoDot()">
-                <i class="fa-solid fa-plus me-1"></i> Tạo đợt mới
+                <i class="fa-solid fa-plus me-1"></i> Tạo mới
             </button>
         </div>
         <div class="table-responsive">
             <table class="table table-hover align-middle border rounded-3 overflow-hidden">
                 <thead class="table-light">
-                    <tr><th>#</th><th>Tên đợt đồ án</th><th>Năm học / HK</th><th>Loại</th><th>Hạn nộp báo cáo</th><th>Trạng thái</th><th>Thao tác</th></tr>
+                    <tr><th>STT</th><th>Tên đợt</th><th>Năm học</th><th>Loại</th><th>Thời hạn</th><th>Trạng thái</th><th>Thao tác</th></tr>
                 </thead>
                 <tbody id="dotTableBody">
                     <tr><td colspan="7" class="text-center py-4"><div class="spinner-border text-primary"></div></td></tr>
@@ -113,12 +113,12 @@ function renderDotRows(listDot) {
                 <td>${new Date(dot.han_nop_bao_cao).toLocaleDateString('vi-VN')}</td>
                 <td>
                     <button class="btn btn-sm ${dot.trang_thai ? 'btn-success' : 'btn-secondary'} rounded-pill px-3" onclick="toggleStatusDotAction('${dot._id}')">
-                        <i class="fa-solid ${dot.trang_thai ? 'fa-lock-open' : 'fa-lock'} me-1"></i> ${dot.trang_thai ? 'Đang mở' : 'Đã đóng'}
+                        ${dot.trang_thai ? 'Đang mở' : 'Đã đóng'}
                     </button>
                 </td>
                 <td>
                     <button class="btn btn-sm btn-outline-primary rounded-pill me-1" onclick="showModalSuaDot('${dot._id}', '${dot.ten_dot}', '${dot.nam_hoc}', ${dot.hoc_ky}, '${ngayBD}', '${ngayKT}')">
-                        <i class="fa-solid fa-pen"></i> Sửa
+                        <i class="fa-solid fa-pen"></i> Chỉnh sửa
                     </button>
                     <button class="btn btn-sm btn-outline-danger rounded-pill" onclick="deleteDotAction('${dot._id}', '${dot.ten_dot}')">
                         <i class="fa-solid fa-trash"></i> Xóa
@@ -226,9 +226,9 @@ async function loadAdminTaiKhoan() {
     const mainContent = document.getElementById('mainContent');
     mainContent.innerHTML = `
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <h4 class="fw-bold text-primary m-0"><i class="fa-solid fa-users-gear me-2"></i>Quản lý Tài khoản Hệ thống</h4>
+            <h4 class="fw-bold text-primary m-0"></i>QUẢN LÝ TÀI KHOẢN</h4>
             <button class="btn btn-primary rounded-pill px-4 fw-bold" onclick="showModalCapTaiKhoan()">
-                <i class="fa-solid fa-user-plus me-1"></i> Cấp tài khoản mới
+                <i class="fa-solid fa-plus me-1"></i> Cấp tài khoản
             </button>
         </div>
         <div class="row g-3 mb-4 bg-light p-3 rounded-4 border">
@@ -250,7 +250,7 @@ async function loadAdminTaiKhoan() {
         <div class="table-responsive">
             <table class="table table-hover align-middle border rounded-3 overflow-hidden">
                 <thead class="table-light">
-                    <tr><th>#</th><th>Mã Số</th><th>Họ và Tên</th><th>Email</th><th>Vai Trò</th><th>Thao Tác</th></tr>
+                    <tr><th>STT</th><th>Mã Số</th><th>Họ và tên</th><th>Email</th><th>Vai Trò</th><th>Thao Tác</th></tr>
                 </thead>
                 <tbody id="usersTableBody">
                     <tr><td colspan="6" class="text-center py-4"><div class="spinner-border text-primary"></div></td></tr>
@@ -287,7 +287,7 @@ function renderUsersRows(listUsers) {
                 <td>${badge}</td>
                 <td>
                     <button class="btn btn-sm btn-outline-primary rounded-pill me-1" onclick="showModalSuaTaiKhoan('${u._id}', '${u.ma_so}', '${u.ho_ten}', '${u.email}', '${u.vai_tro}')">
-                        <i class="fa-solid fa-pen"></i> Sửa
+                        <i class="fa-solid fa-pen"></i> Chỉnh sửa
                     </button>
                     <button class="btn btn-sm btn-outline-danger rounded-pill" onclick="deleteUserAction('${u._id}', '${u.ho_ten}')">
                         <i class="fa-solid fa-trash"></i> Xóa
@@ -340,7 +340,7 @@ async function showModalCapTaiKhoan() {
         };
         try {
             const res = await fetchAPI('/auth/register', 'POST', bodyData);
-            alert(`🎉 ${res.message}\n🔑 Mật khẩu: ${bodyData.mat_khau}`);
+            alert(`🎉 ${res.message}\nMật khẩu: ${bodyData.mat_khau}`);
             modal.hide();
             loadAdminTaiKhoan();
         } catch (error) { alert('Lỗi: ' + error.message); }
@@ -394,9 +394,9 @@ async function loadGVDeTai() {
     const mainContent = document.getElementById('mainContent');
     mainContent.innerHTML = `
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <h4 class="fw-bold text-primary m-0"><i class="fa-solid fa-book-bookmark me-2"></i>Quản lý Đề tài Hướng dẫn</h4>
+            <h4 class="fw-bold text-primary m-0"></i>QUẢN LÝ ĐỀ TÀI</h4>
             <button class="btn btn-primary rounded-pill px-4 fw-bold" onclick="showModalTaoDeTai()">
-                <i class="fa-solid fa-plus me-1"></i> Đăng tải đề tài mới
+                <i class="fa-solid fa-plus me-1"></i> Tạo đề tài mới
             </button>
         </div>
 
@@ -413,7 +413,7 @@ async function loadGVDeTai() {
         <div class="table-responsive">
             <table class="table table-hover align-middle border rounded-3 overflow-hidden">
                 <thead class="table-light">
-                    <tr><th>#</th><th>Tên Đề Tài</th><th>Mô Tả & Yêu Cầu</th><th>Số Lượng</th><th>Nhận SV</th><th>Thao Tác</th></tr>
+                    <tr><th>STT</th><th>Tên Đề Tài</th><th>Mô Tả</th><th>Số Lượng</th><th>Trạng Thái</th><th>Thao Tác</th></tr>
                 </thead>
                 <tbody id="deTaiTableBody">
                     <tr><td colspan="6" class="text-center py-4"><div class="spinner-border text-primary"></div></td></tr>
@@ -444,15 +444,15 @@ function renderGVDeTaiRows(listDeTai) {
                 <td>${index + 1}</td>
                 <td class="fw-bold text-primary" style="max-width: 250px;">${dt.ten_de_tai}</td>
                 <td><small class="text-muted d-block text-truncate" style="max-width: 320px;">${dt.mo_ta}</small></td>
-                <td><span class="badge bg-secondary px-3 py-2">${dt.so_luong_sv_toi_da} SV</span></td>
+                <td><span class="badge bg-secondary px-3 py-2">${dt.so_luong_sv_toi_da}</span></td>
                 <td>
                     <button class="btn btn-sm ${isKhoa ? 'btn-danger' : 'btn-success'} rounded-pill px-3 fw-bold" onclick="toggleKhoaDeTaiAction('${dt._id}')">
-                        <i class="fa-solid ${isKhoa ? 'fa-lock' : 'fa-lock-open'} me-1"></i> ${isKhoa ? 'Đã ngưng nhận' : 'Đang nhận'}
+                        ${isKhoa ? 'Đã ngưng nhận' : 'Đang nhận'}
                     </button>
                 </td>
                 <td>
                     <button class="btn btn-sm btn-outline-primary rounded-pill me-1" onclick="showModalSuaDeTai('${dt._id}', '${escapeHtml(dt.ten_de_tai)}', '${escapeHtml(dt.mo_ta)}', ${dt.so_luong_sv_toi_da}, '${dt.dot_do_an ? (dt.dot_do_an._id || dt.dot_do_an) : ''}')">
-                        <i class="fa-solid fa-pen"></i> Sửa
+                        <i class="fa-solid fa-pen"></i> Chỉnh sửa
                     </button>
                     <button class="btn btn-sm btn-outline-danger rounded-pill" onclick="deleteDeTaiAction('${dt._id}', '${escapeHtml(dt.ten_de_tai)}')">
                         <i class="fa-solid fa-trash"></i> Xóa
@@ -556,7 +556,7 @@ let cacheGVChamDiemList = [];
 async function loadGVDanhSachSinhVien(activeTab = 'tabDuyet') {
     const mainContent = document.getElementById('mainContent');
     mainContent.innerHTML = `
-        <h4 class="fw-bold text-primary mb-4"><i class="fa-solid fa-users-viewfinder me-2"></i>Danh Sách Sinh Viên</h4>
+        <h4 class="fw-bold text-primary mb-4"></i>DANH SÁCH SINH VIÊN</h4>
 
         <!-- 2 Tabs Điều hướng -->
         <ul class="nav nav-pills mb-4 gap-2 bg-light p-2 rounded-4 border">
@@ -615,7 +615,7 @@ function renderGVSVTabContent(activeTab) {
             <div class="table-responsive">
                 <table class="table table-hover align-middle border rounded-3 overflow-hidden">
                     <thead class="table-light">
-                        <tr><th>#</th><th>MSSV</th><th>Họ và Tên SV</th><th>Tên Đề Tài Đăng Ký</th><th>Trạng Thái</th><th>Thao Tác</th></tr>
+                        <tr><th>STT</th><th>MSSV</th><th>Họ và tên</th><th>Đề tài dăng ký</th><th>Trạng Thái</th><th>Thao Tác</th></tr>
                     </thead>
                     <tbody>
                         ${listChoDuyet.map((dk, index) => {
@@ -654,7 +654,7 @@ function renderGVSVTabContent(activeTab) {
             <div class="table-responsive">
                 <table class="table table-hover align-middle border rounded-3 overflow-hidden">
                     <thead class="table-light">
-                        <tr><th>#</th><th>MSSV</th><th>Họ Tên SV</th><th>File Báo Cáo Mới Nhất</th><th>Điểm HD</th><th>Thao Tác</th></tr>
+                        <tr><th>STT</th><th>MSSV</th><th>Họ và tên</th><th>Bài nộp</th><th>Trạng Thái</th><th>Thao Tác</th></tr>
                     </thead>
                     <tbody>
                         ${cacheGVChamDiemList.map((item, index) => {
@@ -807,7 +807,7 @@ async function loadGVDuyetGiaHan() {
         <div class="table-responsive">
             <table class="table table-hover align-middle border rounded-3 overflow-hidden">
                 <thead class="table-light">
-                    <tr><th>#</th><th>Sinh Viên</th><th>Lý Do Xin Gia Hạn</th><th>Hạn Mới Đề Xuất</th><th>Trạng Thái</th><th>Thao Tác</th></tr>
+                    <tr><th>STT</th><th>Sinh viên</th><th>Lý do</th><th>Hạn mới</th><th>Trạng thái</th><th>Thao tác</th></tr>
                 </thead>
                 <tbody id="giaHanTableBody">
                     <tr><td colspan="6" class="text-center py-4"><div class="spinner-border text-primary"></div></td></tr>
@@ -871,7 +871,7 @@ async function loadSVDanhSachDeTai() {
     const mainContent = document.getElementById('mainContent');
     mainContent.innerHTML = `
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <h4 class="fw-bold text-primary m-0"><i class="fa-solid fa-list-check me-2"></i>Tra Cứu & Đăng Ký Đề Tài</h4>
+            <h4 class="fw-bold text-primary m-0"></i>TRA CỨU</h4>
         </div>
 
         <!-- Bộ Lọc Tìm Kiếm Card Realtime -->
@@ -941,7 +941,7 @@ function renderSVDeTaiCards(listDeTai) {
                             </div>
                         </div>
                         <button class="btn btn-primary w-100 rounded-pill fw-bold shadow-sm" onclick="dangKyDeTaiAction('${dt._id}', '${escapeHtml(dt.ten_de_tai)}')">
-                            <i class="fa-solid fa-hand-pointer me-1"></i> Đăng Ký Đề Tài
+                            </i> Đăng Ký Đề Tài
                         </button>
                     </div>
                 </div>
@@ -1116,9 +1116,9 @@ function loadProfile() {
     const mainContent = document.getElementById('mainContent');
     mainContent.innerHTML = `
         <div class="d-flex align-items-center justify-content-between mb-4">
-            <h4 class="fw-bold text-primary m-0"><i class="fa-solid fa-id-card me-2"></i>Thông Tin Cá Nhân</h4>
+            <h4 class="fw-bold text-primary m-0"></i>THÔNG TIN CÁ NHÂN</h4>
             <button class="btn btn-primary rounded-pill px-4 fw-bold shadow-sm" onclick="showModalCapNhatProfile()">
-                <i class="fa-solid fa-pen-to-square me-1"></i> Cập nhật thông tin
+                <i class="fa-solid fa-pen-to-square me-1"></i> Cập nhật
             </button>
         </div>
 

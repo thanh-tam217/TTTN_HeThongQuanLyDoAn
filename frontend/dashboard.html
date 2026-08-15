@@ -22,35 +22,65 @@
         </aside>
 
         <!-- Main Wrapper -->
-        <div class="main-wrapper">
-            <header class="top-header">
-                <div class="search-box">
-                    <i class="fa-solid fa-magnifying-glass"></i>
-                    <input type="text" placeholder="Tìm kiếm tài nguyên hệ thống...">
-                </div>
-
-                <div class="user-profile">
-                    <div class="avatar-circle" id="userAvatar">U</div>
-                    <div>
-                        <div class="fw-bold fs-6" id="userName">User Name</div>
-                        <span id="roleBadge" class="role-badge">ROLE</span>
+        <div class="main-wrapper w-100 p-3 p-md-4">
+            <!-- Header: Fill 100% width, cách đều 2 đầu (Trái: Search, Phải: User + Logout) -->
+            <header class="top-header w-100 mb-4">
+                <div class="d-flex align-items-center justify-content-between px-3 py-2 bg-white rounded-3 border shadow-sm w-100 gap-3">
+                    <!-- 1. Ô tìm kiếm liền mạch (Dùng position thay vì input-group để triệt tiêu đường cắt) -->
+                    <div class="position-relative flex-grow-1" style="max-width: 380px;">
+                        <i class="fa-solid fa-magnifying-glass position-absolute top-50 start-0 translate-middle-y text-secondary ms-3"></i>
+                        <input type="text" 
+                            class="form-control rounded-pill border shadow-none" 
+                            placeholder="Tìm kiếm tài nguyên hệ thống..." 
+                            style="padding-left: 2.5rem; font-size: 0.95rem;">
                     </div>
-                    <button id="btnLogout" class="btn btn-light btn-sm ms-3 text-danger border-0 rounded-circle p-2" title="Đăng xuất">
-                        <i class="fa-solid fa-right-from-bracket"></i>
-                    </button>
+
+                    <!-- 2. Cụm Profile & Nút đăng xuất (khoảng cách chuẩn 1rem) -->
+                    <div class="d-flex align-items-center gap-3">
+                        
+                        <!-- Avatar + Thông tin (Khoảng cách chuẩn 1rem) -->
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center fw-bold flex-shrink-0 shadow-sm" 
+                                id="userAvatar" 
+                                style="width: 42px; height: 42px; font-size: 1.1rem;">
+                                H
+                            </div>
+                            
+                            <!-- Cột thông tin: căn trái để tránh kéo giãn con -->
+                            <div class="d-flex flex-column align-items-start">
+                                <span class="fw-bold text-dark text-nowrap" id="userName" style="font-size: 0.95rem; line-height: 1.2;">
+                                    Hoàng Lâm Thanh Tâm
+                                </span>
+                                
+                                <!-- Khung ADMIN hug content tuyệt đối -->
+                                <span id="roleBadge" class="badge rounded-pill bg-danger-subtle text-danger border border-danger-subtle fw-semibold mt-1 px-2 py-1" style="font-size: 0.7rem; width: fit-content; display: inline-block;">
+                                    ADMIN
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Nút đăng xuất -->
+                        <button id="btnLogout" class="btn btn-outline-danger btn-sm rounded-3 d-inline-flex align-items-center gap-2 px-3 py-2 flex-shrink-0" title="Đăng xuất">
+                            <i class="fa-solid fa-right-from-bracket"></i>
+                            <span class="fw-medium">Đăng xuất</span>
+                        </button>
+
+                    </div>
+                
                 </div>
             </header>
 
-            <section class="welcome-banner">
-                <h2 id="welcomeTitle">Chào mừng trở lại!</h2>
-                <p id="welcomeSub">Hệ thống chuyển đổi số hỗ trợ thực hiện, theo dõi tiến độ và đánh giá đồ án trực quan.</p>
+            <!-- Welcome Banner -->
+            <section class="welcome-banner mb-4">
+                <h2 id="welcomeTitle" class="fw-bold fs-3 text-dark">Chào mừng trở lại!</h2>
+                <p id="welcomeSub" class="text-muted mb-0">Hệ thống chuyển đổi số hỗ trợ thực hiện, theo dõi tiến độ và đánh giá đồ án trực quan.</p>
             </section>
 
             <!-- Dynamic Content Area -->
-            <main class="edu-card" id="mainContent">
+            <main class="edu-card bg-white p-4 rounded-3 border shadow-sm w-100" id="mainContent">
                 <div class="text-center py-5">
                     <div class="spinner-border text-primary" role="status"></div>
-                    <p class="mt-2 text-muted">Đang tải dữ liệu...</p>
+                    <p class="mt-2 text-muted mb-0">Đang tải dữ liệu...</p>
                 </div>
             </main>
         </div>
@@ -67,7 +97,7 @@
                 <div class="modal-body p-4">
                     <form id="formTaoDot">
                         <div class="mb-3">
-                            <label class="form-label fw-bold text-muted">Loại Đồ Án</label>
+                            <label class="form-label fw-bold text-muted">Loại Đồ Án:</label>
                             <select id="loaiDoAnInput" class="form-select" onchange="autoGenerateTenDot()" required>
                                 <option value="DATN" data-label="Đồ án Tốt nghiệp">Đồ án Tốt nghiệp (DATN)</option>
                                 <option value="TTTN" data-label="Thực tập Tốt nghiệp">Thực tập Tốt nghiệp (TTTN)</option>
@@ -76,35 +106,35 @@
                         </div>
                         <div class="row g-2 mb-3">
                             <div class="col-6">
-                                <label class="form-label fw-bold text-muted">Năm Học</label>
+                                <label class="form-label fw-bold text-muted">Năm Học:</label>
                                 <select id="namHocInput" class="form-select" onchange="autoGenerateTenDot()" required></select>
                             </div>
                             <div class="col-6">
-                                <label class="form-label fw-bold text-muted">Học Kỳ</label>
+                                <label class="form-label fw-bold text-muted">Học Kỳ:</label>
                                 <select id="hocKyInput" class="form-select" onchange="autoGenerateTenDot()" required>
                                     <option value="1">Học kỳ 1</option>
                                     <option value="2">Học kỳ 2</option>
-                                    <option value="3">Học kỳ 3 (Hè)</option>
+                                    <option value="3">Học kỳ 3</option>
                                 </select>
                             </div>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label fw-bold text-muted">Tên Đợt Đồ Án (Tự động ghép)</label>
+                            <label class="form-label fw-bold text-muted">Tên Đợt Đồ Án:</label>
                             <input type="text" id="tenDotInput" class="form-control bg-light fw-bold text-primary" readonly required>
                         </div>
                         <div class="row g-2 mb-4">
                             <div class="col-6">
-                                <label class="form-label fw-bold text-muted">Ngày Bắt Đầu</label>
+                                <label class="form-label fw-bold text-muted">Ngày Bắt Đầu:</label>
                                 <input type="date" id="ngayBatDauInput" class="form-control" required>
                             </div>
                             <div class="col-6">
-                                <label class="form-label fw-bold text-muted">Ngày Kết Thúc (Hạn nộp)</label>
+                                <label class="form-label fw-bold text-muted">Ngày Kết Thúc:</label>
                                 <input type="date" id="ngayKetThucInput" class="form-control" required>
                             </div>
                         </div>
                         <div class="d-flex justify-content-end gap-2">
                             <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Hủy bỏ</button>
-                            <button type="submit" class="btn btn-primary rounded-pill px-4 fw-bold">Xác nhận Tạo đợt</button>
+                            <button type="submit" class="btn btn-primary rounded-pill px-4 fw-bold">Lưu</button>
                         </div>
                     </form>
                 </div>
@@ -124,16 +154,16 @@
                     <form id="formSuaDot">
                         <input type="hidden" id="editDotId">
                         <div class="mb-3">
-                            <label class="form-label fw-bold text-muted">Tên Đợt Đồ Án</label>
+                            <label class="form-label fw-bold text-muted">Tên Đợt Đồ Án:</label>
                             <input type="text" id="editTenDotInput" class="form-control fw-bold text-primary" required>
                         </div>
                         <div class="row g-2 mb-3">
                             <div class="col-6">
-                                <label class="form-label fw-bold text-muted">Năm Học</label>
+                                <label class="form-label fw-bold text-muted">Năm Học:</label>
                                 <input type="text" id="editNamHocInput" class="form-control bg-light" readonly>
                             </div>
                             <div class="col-6">
-                                <label class="form-label fw-bold text-muted">Học Kỳ</label>
+                                <label class="form-label fw-bold text-muted">Học Kỳ:</label>
                                 <select id="editHocKyInput" class="form-select" required>
                                     <option value="1">Học kỳ 1</option>
                                     <option value="2">Học kỳ 2</option>
@@ -143,17 +173,17 @@
                         </div>
                         <div class="row g-2 mb-4">
                             <div class="col-6">
-                                <label class="form-label fw-bold text-muted">Ngày Bắt Đầu</label>
+                                <label class="form-label fw-bold text-muted">Ngày Bắt Đầu:</label>
                                 <input type="date" id="editNgayBatDauInput" class="form-control" required>
                             </div>
                             <div class="col-6">
-                                <label class="form-label fw-bold text-muted">Ngày Kết Thúc (Hạn nộp)</label>
+                                <label class="form-label fw-bold text-muted">Ngày Kết Thúc:</label>
                                 <input type="date" id="editNgayKetThucInput" class="form-control" required>
                             </div>
                         </div>
                         <div class="d-flex justify-content-end gap-2">
                             <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Hủy bỏ</button>
-                            <button type="submit" class="btn btn-warning rounded-pill px-4 fw-bold">Cập nhật thay đổi</button>
+                            <button type="submit" class="btn btn-warning rounded-pill px-4 fw-bold">Cập nhật</button>
                         </div>
                     </form>
                 </div>
@@ -172,7 +202,7 @@
                 <div class="modal-body p-4">
                     <form id="formCapTaiKhoan">
                         <div class="mb-3">
-                            <label class="form-label fw-bold text-muted">Vai Trò</label>
+                            <label class="form-label fw-bold text-muted">Vai Trò:</label>
                             <select id="userRoleInput" class="form-select" onchange="autoFetchNextMaSo()" required>
                                 <option value="sinh_vien">Sinh viên</option>
                                 <option value="giang_vien">Giảng viên</option>
@@ -181,25 +211,25 @@
                         </div>
                         <div class="row g-2 mb-3">
                             <div class="col-6">
-                                <label class="form-label fw-bold text-muted">Mã Số (Tự động)</label>
+                                <label class="form-label fw-bold text-muted">Mã Số:</label>
                                 <input type="text" id="userMaSoInput" class="form-control fw-bold text-primary" required>
                             </div>
                             <div class="col-6">
-                                <label class="form-label fw-bold text-muted">Họ và Tên</label>
+                                <label class="form-label fw-bold text-muted">Họ và tên:</label>
                                 <input type="text" id="userHoTenInput" class="form-control" required placeholder="Nguyễn Văn A">
                             </div>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label fw-bold text-muted">Email</label>
+                            <label class="form-label fw-bold text-muted">Email:</label>
                             <input type="email" id="userEmailInput" class="form-control" required placeholder="user@ctuet.edu.vn">
                         </div>
                         <div class="mb-4">
-                            <label class="form-label fw-bold text-muted">Mật khẩu khởi tạo</label>
+                            <label class="form-label fw-bold text-muted">Mật khẩu khởi tạo:</label>
                             <input type="text" id="userPasswordInput" class="form-control fw-bold text-success" required>
                         </div>
                         <div class="d-flex justify-content-end gap-2">
                             <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Hủy bỏ</button>
-                            <button type="submit" class="btn btn-primary rounded-pill px-4 fw-bold">Xác nhận Cấp</button>
+                            <button type="submit" class="btn btn-primary rounded-pill px-4 fw-bold">Lưu</button>
                         </div>
                     </form>
                 </div>
@@ -219,7 +249,7 @@
                     <form id="formSuaTaiKhoan">
                         <input type="hidden" id="editUserId">
                         <div class="mb-3">
-                            <label class="form-label fw-bold text-muted">Vai Trò</label>
+                            <label class="form-label fw-bold text-muted">Vai Trò:</label>
                             <select id="editRoleInput" class="form-select" required>
                                 <option value="sinh_vien">Sinh viên</option>
                                 <option value="giang_vien">Giảng viên</option>
@@ -228,25 +258,25 @@
                         </div>
                         <div class="row g-2 mb-3">
                             <div class="col-6">
-                                <label class="form-label fw-bold text-muted">Mã Số</label>
+                                <label class="form-label fw-bold text-muted">Mã Số:</label>
                                 <input type="text" id="editMaSoInput" class="form-control bg-light fw-bold" readonly>
                             </div>
                             <div class="col-6">
-                                <label class="form-label fw-bold text-muted">Họ và Tên</label>
+                                <label class="form-label fw-bold text-muted">Họ và tên:</label>
                                 <input type="text" id="editHoTenInput" class="form-control" required>
                             </div>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label fw-bold text-muted">Email</label>
+                            <label class="form-label fw-bold text-muted">Email:</label>
                             <input type="email" id="editEmailInput" class="form-control" required>
                         </div>
                         <div class="mb-4">
-                            <label class="form-label fw-bold text-muted">Đặt Mật Khẩu Mới (Để trống nếu giữ nguyên)</label>
+                            <label class="form-label fw-bold text-muted">Đặt lại mật khẩu:</label>
                             <input type="password" id="editPasswordInput" class="form-control" placeholder="Nhập mật khẩu mới...">
                         </div>
                         <div class="d-flex justify-content-end gap-2">
                             <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Hủy bỏ</button>
-                            <button type="submit" class="btn btn-warning rounded-pill px-4 fw-bold">Cập nhật thay đổi</button>
+                            <button type="submit" class="btn btn-warning rounded-pill px-4 fw-bold">Cập nhật</button>
                         </div>
                     </form>
                 </div>
@@ -259,18 +289,18 @@
         <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content rounded-4 border-0 shadow">
                 <div class="modal-header bg-primary text-white p-3 position-relative">
-                    <h5 class="modal-title w-100 text-center fw-bold text-uppercase m-0">ĐĂNG TẢI ĐỀ TÀI MỚI</h5>
+                    <h5 class="modal-title w-100 text-center fw-bold text-uppercase m-0">TẠO ĐỀ TÀI MỚI</h5>
                     <button type="button" class="btn-close btn-close-white position-absolute end-0 me-3" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body p-4">
                     <form id="formTaoDeTai">
                         <div class="row g-3 mb-3">
                             <div class="col-md-8">
-                                <label class="form-label fw-bold text-muted">Đợt Đồ Án</label>
+                                <label class="form-label fw-bold text-muted">Đợt đồ án:</label>
                                 <select id="deTaiDotSelect" class="form-select" required></select>
                             </div>
                             <div class="col-md-4">
-                                <label class="form-label fw-bold text-muted">Số SV Tối Đa</label>
+                                <label class="form-label fw-bold text-muted">Số lượng sinh viên:</label>
                                 <select id="deTaiSoLuongInput" class="form-select" required>
                                     <option value="1">1 Sinh viên</option>
                                     <option value="2" selected>2 Sinh viên</option>
@@ -279,16 +309,16 @@
                             </div>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label fw-bold text-muted">Tên Đề Tài</label>
+                            <label class="form-label fw-bold text-muted">Tên đề tài:</label>
                             <input type="text" id="deTaiTenInput" class="form-control fw-bold text-primary" required placeholder="Nhập tên đề tài...">
                         </div>
                         <div class="mb-4">
-                            <label class="form-label fw-bold text-muted">Mô Tả & Yêu Cầu</label>
+                            <label class="form-label fw-bold text-muted">Mô tả:</label>
                             <textarea id="deTaiMoTaInput" class="form-control" rows="4" required placeholder="Mô tả công nghệ, mục tiêu..."></textarea>
                         </div>
                         <div class="d-flex justify-content-end gap-2">
                             <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Hủy bỏ</button>
-                            <button type="submit" class="btn btn-primary rounded-pill px-4 fw-bold">Xác nhận Đăng</button>
+                            <button type="submit" class="btn btn-primary rounded-pill px-4 fw-bold">Lưu</button>
                         </div>
                     </form>
                 </div>
@@ -309,11 +339,11 @@
                         <input type="hidden" id="editDeTaiId">
                         <div class="row g-3 mb-3">
                             <div class="col-md-8">
-                                <label class="form-label fw-bold text-muted">Đợt Đồ Án</label>
+                                <label class="form-label fw-bold text-muted">Đợt đồ án:</label>
                                 <select id="editDeTaiDotSelect" class="form-select bg-light" disabled></select>
                             </div>
                             <div class="col-md-4">
-                                <label class="form-label fw-bold text-muted">Số SV Tối Đa</label>
+                                <label class="form-label fw-bold text-muted">Số lượng sinh viên:</label>
                                 <select id="editDeTaiSoLuongInput" class="form-select" required>
                                     <option value="1">1 Sinh viên</option>
                                     <option value="2">2 Sinh viên</option>
@@ -322,16 +352,16 @@
                             </div>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label fw-bold text-muted">Tên Đề Tài</label>
+                            <label class="form-label fw-bold text-muted">Tên đề tài:</label>
                             <input type="text" id="editDeTaiTenInput" class="form-control fw-bold text-primary" required>
                         </div>
                         <div class="mb-4">
-                            <label class="form-label fw-bold text-muted">Mô Tả & Yêu Cầu</label>
+                            <label class="form-label fw-bold text-muted">Mô tả:</label>
                             <textarea id="editDeTaiMoTaInput" class="form-control" rows="4" required></textarea>
                         </div>
                         <div class="d-flex justify-content-end gap-2">
                             <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Hủy bỏ</button>
-                            <button type="submit" class="btn btn-warning rounded-pill px-4 fw-bold">Cập nhật thay đổi</button>
+                            <button type="submit" class="btn btn-warning rounded-pill px-4 fw-bold">Cập nhật</button>
                         </div>
                     </form>
                 </div>
@@ -440,30 +470,30 @@
                 <div class="modal-body p-4">
                     <form id="formProfileCapNhat">
                         <div class="mb-3">
-                            <label class="form-label fw-bold text-muted">Vai Trò</label>
+                            <label class="form-label fw-bold text-muted">Vai Trò:</label>
                             <input type="text" id="profileRoleDisplay" class="form-control bg-light" disabled>
                         </div>
                         <div class="row g-2 mb-3">
                             <div class="col-6">
-                                <label class="form-label fw-bold text-muted">Mã Số</label>
+                                <label class="form-label fw-bold text-muted">Mã Số:</label>
                                 <input type="text" id="profileMaSoDisplay" class="form-control bg-light fw-bold text-primary" disabled>
                             </div>
                             <div class="col-6">
-                                <label class="form-label fw-bold text-muted">Họ và Tên</label>
+                                <label class="form-label fw-bold text-muted">Họ và tên:</label>
                                 <input type="text" id="profileHoTenDisplay" class="form-control bg-light" disabled>
                             </div>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label fw-bold text-muted">Email</label>
+                            <label class="form-label fw-bold text-muted">Email:</label>
                             <input type="email" id="profileEmailDisplay" class="form-control bg-light" disabled>
                         </div>
                         <div class="mb-4">
-                            <label class="form-label fw-bold text-muted">Đặt Mật Khẩu Mới (Để trống nếu giữ nguyên)</label>
+                            <label class="form-label fw-bold text-muted">Đặt lại mật khẩu:</label>
                             <input type="password" id="profileNewPasswordInput" class="form-control" placeholder="Nhập mật khẩu mới...">
                         </div>
                         <div class="d-flex justify-content-end gap-2">
                             <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Hủy bỏ</button>
-                            <button type="submit" class="btn btn-warning rounded-pill px-4 fw-bold">Cập nhật thay đổi</button>
+                            <button type="submit" class="btn btn-warning rounded-pill px-4 fw-bold">Cập nhật</button>
                         </div>
                     </form>
                 </div>
